@@ -18,6 +18,110 @@ const emptyForm = {
   available: true,
 };
 
+// =====================================================
+// HOTEL / LODGE QUICK DATA
+// =====================================================
+
+const hotelPresets = [
+  {
+    name: "Phakding Camp One Lodge",
+    destination: "Phakding, Everest Region, Nepal",
+    description:
+      "Comfortable lodge accommodation in Phakding, ideal for trekkers beginning their Everest Base Camp journey. Breakfast is included. Free cancellation is available according to the booking policy. Already booked? Secure your upcoming trip in advance.",
+    price: 3526,
+    capacity: 2,
+    beds: "1 Double Bed / Twin Beds",
+    amenities:
+      "Breakfast Included, Free Cancellation, Everest Region, Hot Shower, WiFi, Trekking Lodge",
+    images:
+      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Sangrila Guest House Lodge",
+    destination: "Phakding, Everest Region, Nepal",
+    description:
+      "Budget-friendly lodge accommodation located approximately 300 meters from the centre of Phakding. Price shown per person. A convenient stay for trekkers travelling through the Everest region.",
+    price: 825,
+    capacity: 2,
+    beds: "Twin Beds",
+    amenities:
+      "Price Per Person, 300 m from Centre, Breakfast Available, Free Cancellation, Hot Shower, Everest Region",
+    images:
+      "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Tribeni Lodge Phakding",
+    destination: "Phakding, Everest Region, Nepal",
+    description:
+      "A convenient trekking lodge in Phakding, approximately 1,526 meters above sea level. Free cancellation is available, with prepayment required for advance bookings.",
+    price: 1526,
+    capacity: 2,
+    beds: "Twin Beds",
+    amenities:
+      "Free Cancellation, Prepayment Required for Advance Booking, Everest Region, Hot Shower, Restaurant",
+    images:
+      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Hotel Waterfall Benker",
+    destination: "Everest Region, Nepal",
+    description:
+      "Comfortable accommodation for trekkers exploring the Everest region. Free cancellation is available, while prepayment is required for advance bookings.",
+    price: 1526,
+    capacity: 2,
+    beds: "Twin Beds",
+    amenities:
+      "Free Cancellation, Prepayment Required for Advance Booking, Everest Region, Restaurant, Hot Shower",
+    images:
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Buddha Lodges & Restaurants",
+    destination: "Monjo, Everest Region, Nepal",
+    description:
+      "Affordable lodge accommodation in Monjo on the Everest trekking route. Price shown per person. No prepayment is required, making it convenient for trekkers.",
+    price: 518,
+    capacity: 2,
+    beds: "Twin Beds",
+    amenities:
+      "Price Per Person, No Prepayment Required, Everest Region, Restaurant, Hot Shower, Trekking Lodge",
+    images:
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Yak & Yeti",
+    destination: "Kathmandu, Nepal",
+    description:
+      "Premium luxury hotel accommodation in Kathmandu. A refined choice for travellers looking for a high-end stay before or after their Himalayan adventure.",
+    price: 11226,
+    capacity: 2,
+    beds: "1 King Bed",
+    amenities:
+      "Luxury Hotel, Breakfast Available, Swimming Pool, Restaurant, WiFi, Premium Stay",
+    images:
+      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=85",
+  },
+
+  {
+    name: "Aloft Kathmandu Thamel",
+    destination: "Kathmandu, Nepal",
+    description:
+      "Modern premium hotel accommodation in Kathmandu. Standard rate is NPR 6,419 per night, currently offered at a reduced rate of NPR 5,214 per night.",
+    price: 5214,
+    capacity: 2,
+    beds: "1 King Bed",
+    amenities:
+      "Special Rate, Original Price NPR 6,419, Breakfast Available, Free WiFi, Modern Hotel, Thamel",
+    images:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85",
+  },
+];
+
 const AdminRooms = () => {
   const [rooms, setRooms] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -26,6 +130,8 @@ const AdminRooms = () => {
 
   const [loading, setLoading] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(true);
+
+  const [quickAdding, setQuickAdding] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -48,8 +154,9 @@ const AdminRooms = () => {
       );
     } catch (err) {
       console.error("Load rooms error:", err);
+
       setError(
-        "Unable to load rooms. Please check your backend."
+        "Unable to load hotels. Please check your backend."
       );
     } finally {
       setRoomsLoading(false);
@@ -65,7 +172,12 @@ const AdminRooms = () => {
   // =====================================================
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
 
     setForm((prev) => ({
       ...prev,
@@ -88,7 +200,38 @@ const AdminRooms = () => {
   };
 
   // =====================================================
-  // SUBMIT ROOM
+  // LOAD PRESET INTO FORM
+  // =====================================================
+
+  const useHotelPreset = (hotel) => {
+    setEditingId(null);
+
+    setForm({
+      name: hotel.name,
+      destination: hotel.destination,
+      description: hotel.description,
+      price: hotel.price,
+      capacity: hotel.capacity,
+      beds: hotel.beds,
+      amenities: hotel.amenities,
+      images: hotel.images,
+      available: true,
+    });
+
+    setError("");
+
+    setSuccess(
+      `${hotel.name} is ready to add. Review the details and click Add Hotel.`
+    );
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // =====================================================
+  // SUBMIT HOTEL
   // =====================================================
 
   const handleSubmit = async (e) => {
@@ -99,13 +242,11 @@ const AdminRooms = () => {
     setSuccess("");
 
     try {
-      // Convert amenities text to array
       const amenitiesArray = form.amenities
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
 
-      // Convert image URLs to array
       const imagesArray = form.images
         .split("\n")
         .map((item) => item.trim())
@@ -133,9 +274,9 @@ const AdminRooms = () => {
         available: form.available,
       };
 
-      // ================================================
+      // =================================================
       // UPDATE
-      // ================================================
+      // =================================================
 
       if (editingId) {
         const result = await updateRoom(
@@ -146,18 +287,18 @@ const AdminRooms = () => {
         if (result?.success === false) {
           throw new Error(
             result.message ||
-              "Failed to update room"
+              "Failed to update hotel"
           );
         }
 
         setSuccess(
-          "Room updated successfully."
+          "Hotel updated successfully."
         );
       }
 
-      // ================================================
+      // =================================================
       // CREATE
-      // ================================================
+      // =================================================
 
       else {
         const result = await createRoom(
@@ -167,12 +308,12 @@ const AdminRooms = () => {
         if (result?.success === false) {
           throw new Error(
             result.message ||
-              "Failed to create room"
+              "Failed to add hotel"
           );
         }
 
         setSuccess(
-          "Room added successfully."
+          "Hotel added successfully."
         );
       }
 
@@ -181,13 +322,13 @@ const AdminRooms = () => {
       await loadRooms();
     } catch (err) {
       console.error(
-        "Save room error:",
+        "Save hotel error:",
         err
       );
 
       setError(
         err.message ||
-          "Unable to save room."
+          "Unable to save hotel."
       );
     } finally {
       setLoading(false);
@@ -195,7 +336,74 @@ const AdminRooms = () => {
   };
 
   // =====================================================
-  // EDIT ROOM
+  // QUICK ADD ALL HOTELS
+  // =====================================================
+
+  const addAllHotels = async () => {
+    const confirmed = window.confirm(
+      "Do you want to add all 7 hotels/lodges to your database?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setQuickAdding(true);
+      setError("");
+      setSuccess("");
+
+      let added = 0;
+
+      for (const hotel of hotelPresets) {
+        const roomData = {
+          name: hotel.name,
+          destination: hotel.destination,
+          description: hotel.description,
+          price: Number(hotel.price),
+          capacity: Number(hotel.capacity),
+          beds: hotel.beds,
+
+          amenities: hotel.amenities
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+
+          images: hotel.images
+            .split("\n")
+            .map((item) => item.trim())
+            .filter(Boolean),
+
+          available: true,
+        };
+
+        await createRoom(roomData);
+
+        added++;
+      }
+
+      setSuccess(
+        `${added} hotels/lodges added successfully.`
+      );
+
+      await loadRooms();
+    } catch (err) {
+      console.error(
+        "Quick add hotels error:",
+        err
+      );
+
+      setError(
+        err.message ||
+          "Some hotels could not be added."
+      );
+
+      await loadRooms();
+    } finally {
+      setQuickAdding(false);
+    }
+  };
+
+  // =====================================================
+  // EDIT HOTEL
   // =====================================================
 
   const handleEdit = (room) => {
@@ -243,12 +451,12 @@ const AdminRooms = () => {
   };
 
   // =====================================================
-  // DELETE ROOM
+  // DELETE HOTEL
   // =====================================================
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this room?"
+      "Are you sure you want to delete this hotel?"
     );
 
     if (!confirmed) return;
@@ -260,19 +468,19 @@ const AdminRooms = () => {
       await deleteRoom(id);
 
       setSuccess(
-        "Room deleted successfully."
+        "Hotel deleted successfully."
       );
 
       await loadRooms();
     } catch (err) {
       console.error(
-        "Delete room error:",
+        "Delete hotel error:",
         err
       );
 
       setError(
         err.message ||
-          "Unable to delete room."
+          "Unable to delete hotel."
       );
     }
   };
@@ -301,7 +509,7 @@ const AdminRooms = () => {
         }
 
         .admin-container {
-          max-width: 1250px;
+          max-width: 1350px;
           margin: 0 auto;
         }
 
@@ -310,7 +518,7 @@ const AdminRooms = () => {
         ========================================= */
 
         .admin-header {
-          margin-bottom: 35px;
+          margin-bottom: 30px;
         }
 
         .admin-label {
@@ -325,17 +533,13 @@ const AdminRooms = () => {
 
         .admin-header h1 {
           margin: 0 0 12px;
-          font-size: clamp(
-            34px,
-            5vw,
-            55px
-          );
+          font-size: clamp(34px, 5vw, 55px);
           line-height: 1.05;
         }
 
         .admin-header p {
           margin: 0;
-          max-width: 700px;
+          max-width: 760px;
           color: #68716b;
           font-size: 15px;
           line-height: 1.7;
@@ -366,6 +570,134 @@ const AdminRooms = () => {
         }
 
         /* =========================================
+           QUICK HOTEL SECTION
+        ========================================= */
+
+        .quick-section {
+          margin-bottom: 45px;
+        }
+
+        .quick-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+
+        .quick-header h2 {
+          margin: 0 0 5px;
+          font-size: 27px;
+        }
+
+        .quick-header p {
+          margin: 0;
+          color: #68716b;
+          font-size: 13px;
+        }
+
+        .quick-add-all {
+          border: 0;
+          border-radius: 10px;
+          background: #18231d;
+          color: white;
+          padding: 13px 18px;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: .25s ease;
+        }
+
+        .quick-add-all:hover {
+          background: #8b6b3f;
+          transform: translateY(-2px);
+        }
+
+        .quick-add-all:disabled {
+          opacity: .6;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .preset-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+          gap: 18px;
+        }
+
+        .preset-card {
+          overflow: hidden;
+          background: white;
+          border: 1px solid #e1e6e1;
+          border-radius: 15px;
+          box-shadow:
+            0 8px 25px
+            rgba(24, 35, 29, .04);
+        }
+
+        .preset-image {
+          height: 150px;
+          position: relative;
+          background: #dfe5df;
+        }
+
+        .preset-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .preset-content {
+          padding: 15px;
+        }
+
+        .preset-content h3 {
+          margin: 0 0 5px;
+          font-size: 16px;
+          line-height: 1.3;
+        }
+
+        .preset-location {
+          margin: 0 0 10px;
+          color: #8b6b3f;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .preset-price {
+          margin-bottom: 12px;
+          font-size: 15px;
+          font-weight: 800;
+          color: #18231d;
+        }
+
+        .preset-price small {
+          color: #7a817c;
+          font-size: 10px;
+          font-weight: 500;
+        }
+
+        .preset-button {
+          width: 100%;
+          border: 1px solid #d7ddd7;
+          border-radius: 8px;
+          background: white;
+          color: #354139;
+          padding: 10px;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .preset-button:hover {
+          background: #18231d;
+          color: white;
+          border-color: #18231d;
+        }
+
+        /* =========================================
            FORM CARD
         ========================================= */
 
@@ -377,7 +709,7 @@ const AdminRooms = () => {
           margin-bottom: 50px;
           box-shadow:
             0 12px 35px
-            rgba(24, 35, 29, 0.06);
+            rgba(24, 35, 29, .06);
         }
 
         .form-heading {
@@ -436,7 +768,7 @@ const AdminRooms = () => {
           color: #18231d;
           font-size: 14px;
           font-family: inherit;
-          transition: 0.2s ease;
+          transition: .2s ease;
         }
 
         .form-group textarea {
@@ -450,7 +782,7 @@ const AdminRooms = () => {
           background: white;
           box-shadow:
             0 0 0 3px
-            rgba(139, 107, 63, 0.08);
+            rgba(139, 107, 63, .08);
         }
 
         .field-help {
@@ -505,7 +837,7 @@ const AdminRooms = () => {
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
-          transition: 0.25s ease;
+          transition: .25s ease;
         }
 
         .primary-btn {
@@ -580,11 +912,11 @@ const AdminRooms = () => {
           border-radius: 18px;
           box-shadow:
             0 10px 30px
-            rgba(24, 35, 29, 0.05);
+            rgba(24, 35, 29, .05);
         }
 
         .admin-room-image {
-          height: 190px;
+          height: 200px;
           background: #dfe5df;
           position: relative;
         }
@@ -613,12 +945,7 @@ const AdminRooms = () => {
           left: 14px;
           padding: 7px 11px;
           border-radius: 30px;
-          background: rgba(
-            255,
-            255,
-            255,
-            0.94
-          );
+          background: rgba(255,255,255,.94);
           color: #28613b;
           font-size: 11px;
           font-weight: 700;
@@ -666,7 +993,7 @@ const AdminRooms = () => {
           font-size: 13px;
           line-height: 1.6;
           display: -webkit-box;
-          -webkit-line-clamp: 3;
+          -webkit-line-clamp: 4;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
@@ -720,7 +1047,7 @@ const AdminRooms = () => {
           font-size: 12px;
           font-weight: 700;
           cursor: pointer;
-          transition: 0.2s ease;
+          transition: .2s ease;
         }
 
         .edit-btn {
@@ -779,9 +1106,23 @@ const AdminRooms = () => {
            RESPONSIVE
         ========================================= */
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1150px) {
+
+          .preset-grid {
+            grid-template-columns:
+              repeat(3, minmax(0, 1fr));
+          }
 
           .admin-rooms-grid {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
+          }
+
+        }
+
+        @media (max-width: 800px) {
+
+          .preset-grid {
             grid-template-columns:
               repeat(2, minmax(0, 1fr));
           }
@@ -806,12 +1147,14 @@ const AdminRooms = () => {
             grid-column: auto;
           }
 
-          .admin-rooms-grid {
+          .admin-rooms-grid,
+          .preset-grid {
             grid-template-columns: 1fr;
           }
 
           .form-heading,
-          .rooms-heading {
+          .rooms-heading,
+          .quick-header {
             flex-direction: column;
             align-items: flex-start;
           }
@@ -821,7 +1164,8 @@ const AdminRooms = () => {
           }
 
           .primary-btn,
-          .secondary-btn {
+          .secondary-btn,
+          .quick-add-all {
             width: 100%;
           }
 
@@ -830,32 +1174,35 @@ const AdminRooms = () => {
       `}</style>
 
       <main className="admin-page">
+
         <div className="admin-container">
 
-          {/* =========================================
+          {/* =================================================
               HEADER
-          ========================================= */}
+          ================================================= */}
 
           <header className="admin-header">
+
             <span className="admin-label">
-              Room Management
+              Hotel & Lodge Management
             </span>
 
             <h1>
-              Manage Your Rooms
+              Manage Hotels & Rooms
             </h1>
 
             <p>
-              Add new rooms, update room
-              information, manage availability
-              and remove rooms directly from
-              your hotel system.
+              Add Everest Region lodges,
+              Kathmandu luxury hotels,
+              room prices, cancellation policies,
+              booking information and hotel images.
             </p>
+
           </header>
 
-          {/* =========================================
+          {/* =================================================
               ALERTS
-          ========================================= */}
+          ================================================= */}
 
           {success && (
             <div className="alert alert-success">
@@ -869,9 +1216,116 @@ const AdminRooms = () => {
             </div>
           )}
 
-          {/* =========================================
+          {/* =================================================
+              QUICK HOTEL LIST
+          ================================================= */}
+
+          <section className="quick-section">
+
+            <div className="quick-header">
+
+              <div>
+
+                <h2>
+                  Recommended Hotels & Lodges
+                </h2>
+
+                <p>
+                  Select a hotel to automatically
+                  fill the hotel form.
+                </p>
+
+              </div>
+
+              <button
+                type="button"
+                className="quick-add-all"
+                onClick={addAllHotels}
+                disabled={quickAdding}
+              >
+                {quickAdding
+                  ? "Adding Hotels..."
+                  : "Add All 7 Hotels"}
+              </button>
+
+            </div>
+
+            <div className="preset-grid">
+
+              {hotelPresets.map(
+                (hotel, index) => (
+
+                  <article
+                    className="preset-card"
+                    key={hotel.name}
+                  >
+
+                    <div className="preset-image">
+
+                      <img
+                        src={hotel.images}
+                        alt={hotel.name}
+                        loading="lazy"
+                      />
+
+                    </div>
+
+                    <div className="preset-content">
+
+                      <h3>
+                        {hotel.name}
+                      </h3>
+
+                      <p className="preset-location">
+                        {hotel.destination}
+                      </p>
+
+                      <div className="preset-price">
+
+                        NPR{" "}
+                        {Number(
+                          hotel.price
+                        ).toLocaleString("en-NP")}
+
+                        <small>
+                          {hotel.name
+                            .toLowerCase()
+                            .includes("buddha") ||
+                          hotel.name
+                            .toLowerCase()
+                            .includes("sangrila")
+                            ? " / person"
+                            : " / night"}
+                        </small>
+
+                      </div>
+
+                      <button
+                        type="button"
+                        className="preset-button"
+                        onClick={() =>
+                          useHotelPreset(
+                            hotel
+                          )
+                        }
+                      >
+                        Use This Hotel
+                      </button>
+
+                    </div>
+
+                  </article>
+
+                )
+              )}
+
+            </div>
+
+          </section>
+
+          {/* =================================================
               ADD / EDIT FORM
-          ========================================= */}
+          ================================================= */}
 
           <section className="room-form-card">
 
@@ -879,13 +1333,13 @@ const AdminRooms = () => {
 
               <h2>
                 {editingId
-                  ? "Edit Room"
-                  : "Add New Room"}
+                  ? "Edit Hotel"
+                  : "Add New Hotel"}
               </h2>
 
               {editingId && (
                 <span className="editing-badge">
-                  Editing Room
+                  Editing Hotel
                 </span>
               )}
 
@@ -895,11 +1349,12 @@ const AdminRooms = () => {
 
               <div className="form-grid">
 
-                {/* ROOM NAME */}
+                {/* HOTEL NAME */}
 
                 <div className="form-group">
+
                   <label>
-                    Room Name *
+                    Hotel / Lodge Name *
                   </label>
 
                   <input
@@ -907,14 +1362,16 @@ const AdminRooms = () => {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    placeholder="Deluxe Mountain View Room"
+                    placeholder="Phakding Camp One Lodge"
                     required
                   />
+
                 </div>
 
                 {/* DESTINATION */}
 
                 <div className="form-group">
+
                   <label>
                     Destination *
                   </label>
@@ -924,16 +1381,18 @@ const AdminRooms = () => {
                     name="destination"
                     value={form.destination}
                     onChange={handleChange}
-                    placeholder="Kathmandu"
+                    placeholder="Phakding, Everest Region, Nepal"
                     required
                   />
+
                 </div>
 
                 {/* PRICE */}
 
                 <div className="form-group">
+
                   <label>
-                    Price Per Night (NPR) *
+                    Price *
                   </label>
 
                   <input
@@ -941,15 +1400,23 @@ const AdminRooms = () => {
                     name="price"
                     value={form.price}
                     onChange={handleChange}
-                    placeholder="4000"
+                    placeholder="3526"
                     min="0"
                     required
                   />
+
+                  <span className="field-help">
+                    Enter the main price. Mention
+                    "per person" or "per night"
+                    in amenities/description.
+                  </span>
+
                 </div>
 
                 {/* CAPACITY */}
 
                 <div className="form-group">
+
                   <label>
                     Guest Capacity *
                   </label>
@@ -959,15 +1426,17 @@ const AdminRooms = () => {
                     name="capacity"
                     value={form.capacity}
                     onChange={handleChange}
-                    placeholder="3"
+                    placeholder="2"
                     min="1"
                     required
                   />
+
                 </div>
 
                 {/* BEDS */}
 
                 <div className="form-group">
+
                   <label>
                     Beds *
                   </label>
@@ -977,9 +1446,10 @@ const AdminRooms = () => {
                     name="beds"
                     value={form.beds}
                     onChange={handleChange}
-                    placeholder="1 Double Bed"
+                    placeholder="1 Double Bed / Twin Beds"
                     required
                   />
+
                 </div>
 
                 {/* AVAILABLE */}
@@ -995,12 +1465,16 @@ const AdminRooms = () => {
                     <input
                       type="checkbox"
                       name="available"
-                      checked={form.available}
-                      onChange={handleChange}
+                      checked={
+                        form.available
+                      }
+                      onChange={
+                        handleChange
+                      }
                     />
 
                     <span>
-                      Room is available
+                      Hotel / Room is available
                     </span>
 
                   </label>
@@ -1012,14 +1486,18 @@ const AdminRooms = () => {
                 <div className="form-group full">
 
                   <label>
-                    Room Description *
+                    Hotel Description *
                   </label>
 
                   <textarea
                     name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Comfortable room with beautiful Himalayan mountain views."
+                    value={
+                      form.description
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Comfortable lodge in Phakding with breakfast included and free cancellation."
                     required
                   />
 
@@ -1030,19 +1508,25 @@ const AdminRooms = () => {
                 <div className="form-group full">
 
                   <label>
-                    Amenities
+                    Hotel Features / Policies
                   </label>
 
                   <input
                     type="text"
                     name="amenities"
-                    value={form.amenities}
-                    onChange={handleChange}
-                    placeholder="WiFi, Hot Shower, TV, Mountain View"
+                    value={
+                      form.amenities
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Breakfast Included, Free Cancellation, WiFi, Hot Shower"
                   />
 
                   <span className="field-help">
-                    Separate amenities with commas.
+                    Separate each item with commas.
+                    Example: Free Cancellation,
+                    Breakfast Included, Prepayment Required.
                   </span>
 
                 </div>
@@ -1052,7 +1536,7 @@ const AdminRooms = () => {
                 <div className="form-group full">
 
                   <label>
-                    Image URLs
+                    Hotel Image URLs
                   </label>
 
                   <textarea
@@ -1060,7 +1544,7 @@ const AdminRooms = () => {
                     value={form.images}
                     onChange={handleChange}
                     placeholder={
-                      "https://example.com/room-1.jpg\nhttps://example.com/room-2.jpg"
+                      "https://example.com/hotel-1.jpg\nhttps://example.com/hotel-2.jpg"
                     }
                   />
 
@@ -1072,7 +1556,9 @@ const AdminRooms = () => {
 
               </div>
 
-              {/* FORM BUTTONS */}
+              {/* =================================================
+                  BUTTONS
+              ================================================= */}
 
               <div className="form-actions">
 
@@ -1081,14 +1567,17 @@ const AdminRooms = () => {
                   className="primary-btn"
                   disabled={loading}
                 >
+
                   {loading
                     ? "Saving..."
                     : editingId
-                    ? "Update Room"
-                    : "Add Room"}
+                    ? "Update Hotel"
+                    : "Add Hotel"}
+
                 </button>
 
                 {editingId && (
+
                   <button
                     type="button"
                     className="secondary-btn"
@@ -1096,6 +1585,7 @@ const AdminRooms = () => {
                   >
                     Cancel Edit
                   </button>
+
                 )}
 
               </div>
@@ -1104,52 +1594,62 @@ const AdminRooms = () => {
 
           </section>
 
-          {/* =========================================
-              EXISTING ROOMS
-          ========================================= */}
+          {/* =================================================
+              EXISTING HOTELS
+          ================================================= */}
 
           <section>
 
             <div className="rooms-heading">
 
               <div>
+
                 <h2>
-                  Existing Rooms
+                  Existing Hotels & Lodges
                 </h2>
 
                 <p>
-                  Manage rooms currently stored
-                  in your database.
+                  Manage hotels and lodges currently
+                  stored in your database.
                 </p>
+
               </div>
 
               <span className="rooms-count">
+
                 {rooms.length}{" "}
+
                 {rooms.length === 1
-                  ? "Room"
-                  : "Rooms"}
+                  ? "Hotel"
+                  : "Hotels"}
+
               </span>
 
             </div>
 
             {roomsLoading ? (
+
               <div className="rooms-loading">
-                Loading rooms...
+                Loading hotels...
               </div>
+
             ) : rooms.length === 0 ? (
+
               <div className="rooms-empty">
 
                 <h3>
-                  No rooms added yet
+                  No hotels added yet
                 </h3>
 
                 <p>
-                  Add your first room using
-                  the form above.
+                  Select a hotel above or
+                  use the form to add one.
                 </p>
 
               </div>
+
             ) : (
+
               <div className="admin-rooms-grid">
 
                 {rooms.map((room) => (
@@ -1169,15 +1669,19 @@ const AdminRooms = () => {
                       room.images.length > 0 ? (
 
                         <img
-                          src={room.images[0]}
-                          alt={room.name}
+                          src={
+                            room.images[0]
+                          }
+                          alt={
+                            room.name
+                          }
                           loading="lazy"
                         />
 
                       ) : (
 
                         <div className="no-image">
-                          No Room Image
+                          No Hotel Image
                         </div>
 
                       )}
@@ -1190,9 +1694,11 @@ const AdminRooms = () => {
                             : "")
                         }
                       >
+
                         {room.available
                           ? "● Available"
                           : "● Unavailable"}
+
                       </span>
 
                     </div>
@@ -1208,12 +1714,15 @@ const AdminRooms = () => {
                         </h3>
 
                         <span className="admin-room-price">
+
                           NPR{" "}
+
                           {Number(
                             room.price || 0
                           ).toLocaleString(
                             "en-NP"
                           )}
+
                         </span>
 
                       </div>
@@ -1246,7 +1755,7 @@ const AdminRooms = () => {
                         <div className="admin-amenities">
 
                           {room.amenities
-                            .slice(0, 5)
+                            .slice(0, 6)
                             .map(
                               (
                                 amenity,
@@ -1279,10 +1788,12 @@ const AdminRooms = () => {
                           type="button"
                           className="edit-btn"
                           onClick={() =>
-                            handleEdit(room)
+                            handleEdit(
+                              room
+                            )
                           }
                         >
-                          Edit Room
+                          Edit Hotel
                         </button>
 
                         <button
@@ -1306,11 +1817,13 @@ const AdminRooms = () => {
                 ))}
 
               </div>
+
             )}
 
           </section>
 
         </div>
+
       </main>
     </>
   );

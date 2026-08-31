@@ -2,965 +2,154 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRooms } from "../services/roomApi";
 
-const Rooms = () => {
+export default function Rooms() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const [searchInfo, setSearchInfo] = useState(null);
-  const [isSearchResult, setIsSearchResult] = useState(false);
-
-  // =====================================================
-  // LOAD ROOMS
-  // =====================================================
 
   useEffect(() => {
-    const loadRooms = async () => {
+    async function loadRooms() {
       try {
-        setLoading(true);
-        setError("");
-
-        const savedSearch = sessionStorage.getItem("roomSearch");
-        const savedResults = sessionStorage.getItem("roomSearchResults");
-
-        // -------------------------------------------------
-        // LOAD SAVED SEARCH RESULTS
-        // -------------------------------------------------
-
-        if (savedSearch && savedResults) {
-          try {
-            const parsedSearch = JSON.parse(savedSearch);
-            const parsedResults = JSON.parse(savedResults);
-
-            setSearchInfo(parsedSearch);
-
-            setRooms(
-              Array.isArray(parsedResults)
-                ? parsedResults
-                : []
-            );
-
-            setIsSearchResult(true);
-            setLoading(false);
-
-            return;
-          } catch (storageError) {
-            console.warn(
-              "Saved room search could not be read:",
-              storageError
-            );
-
-            sessionStorage.removeItem("roomSearch");
-            sessionStorage.removeItem("roomSearchResults");
-          }
-        }
-
-        // -------------------------------------------------
-        // NORMAL ROOMS PAGE
-        // -------------------------------------------------
-
         const result = await getRooms();
 
-        if (result?.success === false) {
-          throw new Error(
-            result?.message || "Unable to load rooms."
-          );
+        console.log("ROOM RESULT:", result);
+
+        if (Array.isArray(result?.data)) {
+          setRooms(result.data);
+        } else if (Array.isArray(result)) {
+          setRooms(result);
+        } else {
+          setRooms([]);
         }
-
-        setRooms(
-          Array.isArray(result?.data)
-            ? result.data
-            : []
-        );
-
-        setIsSearchResult(false);
-        setSearchInfo(null);
-      } catch (err) {
-        console.error("Rooms loading error:", err);
-
-        setError(
-          "Unable to load rooms. Please try again."
-        );
+      } catch (error) {
+        console.error("ROOM ERROR:", error);
+        setRooms([]);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     loadRooms();
   }, []);
 
-  // =====================================================
-  // CLEAR SEARCH
-  // =====================================================
-
-  const clearSearch = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      sessionStorage.removeItem("roomSearch");
-      sessionStorage.removeItem("roomSearchResults");
-
-      const result = await getRooms();
-
-      if (result?.success === false) {
-        throw new Error(
-          result?.message || "Unable to reload rooms."
-        );
-      }
-
-      setRooms(
-        Array.isArray(result?.data)
-          ? result.data
-          : []
-      );
-
-      setSearchInfo(null);
-      setIsSearchResult(false);
-    } catch (err) {
-      console.error("Clear search error:", err);
-
-      setError("Unable to reload rooms.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // =====================================================
-  // FORMAT DATE
-  // =====================================================
-
-  const formatDate = (date) => {
-    if (!date) {
-      return "";
-    }
-
-    const selectedDate = new Date(
-      date + "T00:00:00"
-    );
-
-    if (Number.isNaN(selectedDate.getTime())) {
-      return date;
-    }
-
-    return selectedDate.toLocaleDateString(
-      "en-US",
-      {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }
-    );
-  };
-
-  // =====================================================
-  // IMAGE ERROR FALLBACK
-  // =====================================================
-
-  const handleImageError = (event) => {
-    event.currentTarget.style.display = "none";
-
-    const parent = event.currentTarget.parentElement;
-
-    if (parent) {
-      parent.classList.add("image-error");
-    }
-  };
-
-  // =====================================================
-  // LOADING
-  // =====================================================
-
-  if (loading) {
-    return (
-      <>
-        <style>{`
-          .rooms-loading {
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: #f7f8f6;
-            font-family: Arial, Helvetica, sans-serif;
-          }
-
-          .loading-spinner {
-            width: 38px;
-            height: 38px;
-            border: 3px solid #ddd;
-            border-top-color: #8b6b3f;
-            border-radius: 50%;
-            animation: roomsSpin 0.8s linear infinite;
-            margin-bottom: 15px;
-          }
-
-          .rooms-loading p {
-            margin: 0;
-            color: #68716b;
-            font-size: 14px;
-          }
-
-          @keyframes roomsSpin {
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
-
-        <section className="rooms-loading">
-          <div className="loading-spinner"></div>
-
-          <p>
-            Finding the perfect Himalayan stay...
-          </p>
-        </section>
-      </>
-    );
-  }
-
-  // =====================================================
-  // ERROR
-  // =====================================================
-
-  if (error) {
-    return (
-      <>
-        <style>{`
-          .rooms-error {
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px 20px;
-            background: #f7f8f6;
-            font-family: Arial, Helvetica, sans-serif;
-          }
-
-          .rooms-error h2 {
-            margin: 0 0 10px;
-            color: #18231d;
-            font-size: 30px;
-          }
-
-          .rooms-error p {
-            margin: 0;
-            color: #68716b;
-          }
-
-          .rooms-error button {
-            margin-top: 25px;
-            border: 0;
-            background: #18231d;
-            color: white;
-            padding: 13px 22px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-          }
-
-          .rooms-error button:hover {
-            background: #8b6b3f;
-          }
-        `}</style>
-
-        <section className="rooms-error">
-          <h2>Something went wrong</h2>
-
-          <p>{error}</p>
-
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-          >
-            Try Again
-          </button>
-        </section>
-      </>
-    );
-  }
-
-  // =====================================================
-  // RENDER
-  // =====================================================
-
   return (
-    <>
-      <style>{`
-        .rooms-section {
-          padding: 90px 6%;
-          background: #f7f8f6;
-          font-family: Arial, Helvetica, sans-serif;
-          min-height: 70vh;
-        }
+    <div className="rooms-page">
 
-        .rooms-container {
-          max-width: 1250px;
-          margin: 0 auto;
-        }
+      {/* HERO */}
 
-        /* ==========================================
-           HEADER
-        ========================================== */
+      <section className="rooms-hero">
+        <div className="rooms-hero-overlay">
+          <div className="rooms-hero-content">
 
-        .rooms-heading {
-          text-align: center;
-          max-width: 720px;
-          margin: 0 auto 35px;
-        }
-
-        .rooms-label {
-          display: inline-block;
-          margin-bottom: 12px;
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: #8b6b3f;
-        }
-
-        .rooms-heading h1 {
-          margin: 0 0 18px;
-          font-size: clamp(36px, 5vw, 58px);
-          line-height: 1.05;
-          color: #18231d;
-          font-weight: 700;
-        }
-
-        .rooms-heading p {
-          margin: 0;
-          color: #68716b;
-          font-size: 17px;
-          line-height: 1.7;
-        }
-
-        /* ==========================================
-           SEARCH SUMMARY
-        ========================================== */
-
-        .search-summary {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 20px;
-          padding: 18px 20px;
-          margin: 0 auto 38px;
-          max-width: 1050px;
-          background: #ffffff;
-          border: 1px solid #e3e7e2;
-          border-radius: 16px;
-          box-shadow: 0 8px 25px rgba(24, 35, 29, 0.05);
-        }
-
-        .search-summary-left {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 9px;
-        }
-
-        .search-summary-title {
-          color: #18231d;
-          font-size: 14px;
-          font-weight: 700;
-          margin-right: 5px;
-        }
-
-        .search-chip {
-          display: inline-flex;
-          align-items: center;
-          padding: 8px 12px;
-          border-radius: 30px;
-          background: #f3f5f2;
-          color: #46524a;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .clear-search {
-          flex-shrink: 0;
-          border: 1px solid #d7ddd7;
-          background: white;
-          color: #26332b;
-          padding: 10px 15px;
-          border-radius: 9px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: 0.25s ease;
-        }
-
-        .clear-search:hover {
-          background: #18231d;
-          border-color: #18231d;
-          color: white;
-        }
-
-        /* ==========================================
-           RESULTS COUNT
-        ========================================== */
-
-        .results-count {
-          margin-bottom: 20px;
-          color: #68716b;
-          font-size: 14px;
-        }
-
-        .results-count strong {
-          color: #18231d;
-        }
-
-        /* ==========================================
-           GRID
-        ========================================== */
-
-        .rooms-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 28px;
-        }
-
-        /* ==========================================
-           ROOM CARD
-        ========================================== */
-
-        .room-card {
-          overflow: hidden;
-          background: #ffffff;
-          border: 1px solid #e5e8e4;
-          border-radius: 22px;
-          box-shadow: 0 12px 35px rgba(24, 35, 29, 0.07);
-          transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
-        }
-
-        .room-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 45px rgba(24, 35, 29, 0.13);
-        }
-
-        /* ==========================================
-           IMAGE
-        ========================================== */
-
-        .room-image {
-          position: relative;
-          height: 260px;
-          overflow: hidden;
-          background: #dfe4df;
-        }
-
-        .room-image.image-error::after {
-          content: "Himalayan Backpacker House";
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(
-            135deg,
-            #dce5df,
-            #b9c8bd
-          );
-          color: #425249;
-          font-size: 15px;
-          font-weight: 600;
-        }
-
-        .room-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform 0.5s ease;
-        }
-
-        .room-card:hover .room-image img {
-          transform: scale(1.06);
-        }
-
-        .room-image-placeholder {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(
-            135deg,
-            #dce5df,
-            #b9c8bd
-          );
-          color: #425249;
-          font-size: 15px;
-          font-weight: 600;
-          text-align: center;
-        }
-
-        /* ==========================================
-           AVAILABILITY
-        ========================================== */
-
-        .availability {
-          position: absolute;
-          top: 18px;
-          left: 18px;
-          z-index: 2;
-          padding: 8px 13px;
-          border-radius: 30px;
-          background: rgba(255, 255, 255, 0.94);
-          color: #28613b;
-          font-size: 12px;
-          font-weight: 700;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .availability.unavailable {
-          color: #9b3636;
-        }
-
-        /* ==========================================
-           CONTENT
-        ========================================== */
-
-        .room-content {
-          padding: 25px;
-        }
-
-        .room-title-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 15px;
-          align-items: flex-start;
-          margin-bottom: 10px;
-        }
-
-        .room-title {
-          margin: 0;
-          color: #18231d;
-          font-size: 23px;
-          line-height: 1.25;
-        }
-
-        .room-price {
-          flex-shrink: 0;
-          text-align: right;
-        }
-
-        .room-price strong {
-          display: block;
-          color: #8b6b3f;
-          font-size: 21px;
-        }
-
-        .room-price span {
-          color: #8b918d;
-          font-size: 11px;
-        }
-
-        /* ==========================================
-           DESTINATION
-        ========================================== */
-
-        .room-destination {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          margin-bottom: 14px;
-          color: #8b6b3f;
-          font-size: 12px;
-          font-weight: 700;
-        }
-
-        .room-description {
-          margin: 0 0 20px;
-          color: #6c746f;
-          line-height: 1.65;
-          font-size: 14px;
-        }
-
-        /* ==========================================
-           ROOM INFO
-        ========================================== */
-
-        .room-info {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 9px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid #eceeeb;
-        }
-
-        .info-item {
-          padding: 8px 11px;
-          background: #f5f7f4;
-          border-radius: 9px;
-          color: #4d5751;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        /* ==========================================
-           AMENITIES
-        ========================================== */
-
-        .amenities {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 7px;
-          margin: 18px 0 22px;
-        }
-
-        .amenity {
-          color: #59635d;
-          font-size: 12px;
-        }
-
-        .amenity:not(:last-child)::after {
-          content: "•";
-          margin-left: 7px;
-          color: #a3aaa5;
-        }
-
-        /* ==========================================
-           ACTIONS
-        ========================================== */
-
-        .room-actions {
-          display: flex;
-          gap: 10px;
-        }
-
-        .room-btn {
-          flex: 1;
-          padding: 13px 15px;
-          border-radius: 10px;
-          font-size: 13px;
-          font-weight: 700;
-          cursor: pointer;
-          text-align: center;
-          text-decoration: none;
-          transition: 0.25s ease;
-          box-sizing: border-box;
-        }
-
-        .details-btn {
-          border: 1px solid #d8ddd8;
-          color: #26332b;
-          background: white;
-        }
-
-        .details-btn:hover {
-          background: #f2f4f1;
-          transform: translateY(-2px);
-        }
-
-        .book-btn {
-          border: 1px solid #18231d;
-          background: #18231d;
-          color: white;
-        }
-
-        .book-btn:hover {
-          background: #8b6b3f;
-          border-color: #8b6b3f;
-          transform: translateY(-2px);
-        }
-
-        .book-btn.disabled {
-          border-color: #d8ddd8;
-          background: #ecefeb;
-          color: #8b918d;
-          cursor: not-allowed;
-        }
-
-        .book-btn.disabled:hover {
-          transform: none;
-          background: #ecefeb;
-          border-color: #d8ddd8;
-        }
-
-        /* ==========================================
-           NO RESULTS
-        ========================================== */
-
-        .no-results {
-          max-width: 650px;
-          margin: 25px auto 0;
-          padding: 55px 30px;
-          text-align: center;
-          background: #ffffff;
-          border: 1px solid #e3e7e2;
-          border-radius: 22px;
-          box-shadow: 0 12px 35px rgba(24, 35, 29, 0.05);
-        }
-
-        .no-results-icon {
-          width: 58px;
-          height: 58px;
-          margin: 0 auto 20px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f3f5f2;
-          color: #68716b;
-          font-size: 24px;
-        }
-
-        .no-results h2 {
-          margin: 0 0 10px;
-          color: #18231d;
-          font-size: 27px;
-        }
-
-        .no-results p {
-          margin: 0 auto;
-          max-width: 480px;
-          color: #68716b;
-          font-size: 14px;
-          line-height: 1.7;
-        }
-
-        .no-results button {
-          margin-top: 25px;
-          border: 0;
-          background: #18231d;
-          color: white;
-          padding: 13px 20px;
-          border-radius: 10px;
-          font-size: 13px;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
-        .no-results button:hover {
-          background: #8b6b3f;
-        }
-
-        /* ==========================================
-           RESPONSIVE
-        ========================================== */
-
-        @media (max-width: 1000px) {
-          .rooms-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .search-summary {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .clear-search {
-            width: 100%;
-          }
-        }
-
-        @media (max-width: 650px) {
-          .rooms-section {
-            padding: 60px 18px;
-          }
-
-          .rooms-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .room-image {
-            height: 230px;
-          }
-
-          .room-title-row {
-            flex-direction: column;
-          }
-
-          .room-price {
-            text-align: left;
-          }
-
-          .search-summary-left {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .search-chip {
-            width: 100%;
-            box-sizing: border-box;
-          }
-
-          .room-actions {
-            flex-direction: column;
-          }
-        }
-      `}</style>
-
-      <section className="rooms-section">
-        <div className="rooms-container">
-
-          {/* ==========================================
-              HEADER
-          ========================================== */}
-
-          <div className="rooms-heading">
-            <span className="rooms-label">
-              {isSearchResult
-                ? "Your Search"
-                : "Stay With Us"}
-            </span>
+            <span>HIMALAYAN STAYS</span>
 
             <h1>
-              {isSearchResult
-                ? "Your Perfect Stay"
-                : "Rooms & Stays"}
+              Stay in the Heart
+              <br />
+              of the Himalayas
             </h1>
 
             <p>
-              {isSearchResult
-                ? "Explore stays selected around your search preferences and discover a comfortable base for your Himalayan journey."
-                : "Relax, recharge and experience warm Himalayan hospitality in the heart of your journey."}
+              Discover authentic mountain lodges in the
+              Everest Region and premium luxury hotels
+              in Kathmandu.
             </p>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ROOMS */}
+
+      <section className="rooms-section">
+
+        <div className="rooms-container">
+
+          <div className="section-heading">
+
+            <span>EXPLORE OUR STAYS</span>
+
+            <h2>
+              Mountain Lodges & Luxury Hotels
+            </h2>
+
+            <p>
+              From traditional Everest Region lodges
+              to comfortable luxury hotels in Kathmandu.
+            </p>
+
           </div>
 
-          {/* ==========================================
-              SEARCH SUMMARY
-          ========================================== */}
+          {/* LOADING */}
 
-          {isSearchResult && searchInfo && (
-            <div className="search-summary">
+          {loading && (
+            <div className="loading">
+              Loading mountain stays...
+            </div>
+          )}
 
-              <div className="search-summary-left">
+          {/* ROOMS */}
 
-                <span className="search-summary-title">
-                  Searching for
-                </span>
+          {!loading && rooms.length > 0 && (
 
-                {searchInfo.destination && (
-                  <span className="search-chip">
-                    📍 {searchInfo.destination}
-                  </span>
-                )}
+            <>
 
-                {searchInfo.checkIn && (
-                  <span className="search-chip">
-                    {formatDate(searchInfo.checkIn)}
-                  </span>
-                )}
-
-                {searchInfo.checkOut && (
-                  <span className="search-chip">
-                    → {formatDate(searchInfo.checkOut)}
-                  </span>
-                )}
-
-                {searchInfo.guests && (
-                  <span className="search-chip">
-                    👥 {searchInfo.guests}{" "}
-                    {Number(searchInfo.guests) === 1
-                      ? "Guest"
-                      : "Guests"}
-                  </span>
-                )}
-
+              <div className="rooms-count">
+                <strong>{rooms.length}</strong>{" "}
+                stays available
               </div>
 
-              <button
-                type="button"
-                className="clear-search"
-                onClick={clearSearch}
-              >
-                View All Rooms
-              </button>
+              <div className="rooms-grid">
 
-            </div>
-          )}
+                {rooms.map((room) => (
 
-          {/* ==========================================
-              RESULT COUNT
-          ========================================== */}
-
-          {rooms.length > 0 && (
-            <div className="results-count">
-              <strong>{rooms.length}</strong>{" "}
-              {rooms.length === 1
-                ? "room available"
-                : "rooms available"}
-            </div>
-          )}
-
-          {/* ==========================================
-              ROOM GRID
-          ========================================== */}
-
-          {rooms.length > 0 ? (
-            <div className="rooms-grid">
-
-              {rooms.map((room) => {
-
-                const hasImage =
-                  Array.isArray(room.images) &&
-                  room.images.length > 0 &&
-                  room.images[0];
-
-                const hasAmenities =
-                  Array.isArray(room.amenities) &&
-                  room.amenities.length > 0;
-
-                return (
                   <article
                     className="room-card"
                     key={room._id}
                   >
 
-                    {/* ==================================
-                        ROOM IMAGE
-                    ================================== */}
+                    {/* IMAGE */}
 
                     <div className="room-image">
 
-                      {hasImage ? (
-                        <img
-                          src={room.images[0]}
-                          alt={room.name || "Room"}
-                          loading="lazy"
-                          onError={handleImageError}
-                        />
-                      ) : (
-                        <div className="room-image-placeholder">
-                          Himalayan Backpacker House
-                        </div>
-                      )}
-
-                      <span
-                        className={
-                          "availability " +
-                          (!room.available
-                            ? "unavailable"
-                            : "")
+                      <img
+                        src={
+                          room.images?.[0] ||
+                          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"
                         }
-                      >
-                        {room.available
-                          ? "● Available"
-                          : "● Not Available"}
-                      </span>
+                        alt={room.name}
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80";
+                        }}
+                      />
+
+                      {room.available && (
+                        <span className="available">
+                          ● Available
+                        </span>
+                      )}
 
                     </div>
 
-                    {/* ==================================
-                        ROOM CONTENT
-                    ================================== */}
+                    {/* CONTENT */}
 
                     <div className="room-content">
 
-                      <div className="room-title-row">
+                      <div className="room-top">
 
-                        <h2 className="room-title">
-                          {room.name}
-                        </h2>
+                        <div>
 
-                        <div className="room-price">
+                          <h3>
+                            {room.name}
+                          </h3>
+
+                          <p className="location">
+                            📍 {room.destination}
+                          </p>
+
+                        </div>
+
+                        <div className="price">
 
                           <strong>
                             NPR{" "}
@@ -969,152 +158,599 @@ const Rooms = () => {
                             ).toLocaleString("en-NP")}
                           </strong>
 
-                          <span>
+                          <small>
                             per night
-                          </span>
+                          </small>
 
                         </div>
 
                       </div>
 
-                      {/* DESTINATION */}
-
-                      {room.destination && (
-                        <div className="room-destination">
-                          📍 {room.destination}
-                        </div>
-                      )}
-
-                      {/* DESCRIPTION */}
-
-                      <p className="room-description">
+                      <p className="description">
                         {room.description}
                       </p>
 
-                      {/* ==================================
-                          ROOM INFORMATION
-                      ================================== */}
+                      {/* INFO */}
 
-                      <div className="room-info">
+                      <div className="info">
 
-                        <span className="info-item">
-                          👥 {room.capacity || 0} Guests
+                        <span>
+                          👥 {room.capacity} Guests
                         </span>
 
-                        {room.beds && (
-                          <span className="info-item">
-                            🛏 {room.beds}
-                          </span>
-                        )}
+                        <span>
+                          🛏 {room.beds}
+                        </span>
 
                       </div>
 
-                      {/* ==================================
-                          AMENITIES
-                      ================================== */}
+                      {/* AMENITIES */}
 
-                      {hasAmenities && (
-                        <div className="amenities">
+                      <div className="amenities">
 
-                          {room.amenities.map(
-                            (amenity, index) => (
-                              <span
-                                className="amenity"
-                                key={
-                                  room._id +
-                                  "-" +
-                                  index
-                                }
-                              >
-                                {amenity}
+                        {room.amenities
+                          ?.slice(0, 4)
+                          .map(
+                            (item, index) => (
+                              <span key={index}>
+                                {item}
                               </span>
                             )
                           )}
 
-                        </div>
-                      )}
+                      </div>
 
-                      {/* ==================================
-                          ACTIONS
-                      ================================== */}
+                      {/* BUTTONS */}
 
-                      <div className="room-actions">
+                      <div className="buttons">
 
                         <Link
-                          to={
-                            "/rooms/" +
-                            room._id
-                          }
-                          className="room-btn details-btn"
+                          to={`/rooms/${room._id}`}
+                          className="details"
                         >
                           View Details
                         </Link>
 
-                        {room.available ? (
-                          <Link
-                            to={
-                              "/booking?room=" +
-                              room._id
-                            }
-                            className="room-btn book-btn"
-                          >
-                            Book Now
-                          </Link>
-                        ) : (
-                          <span
-                            className="room-btn book-btn disabled"
-                          >
-                            Unavailable
-                          </span>
-                        )}
+                        <Link
+                          to={`/booking?room=${room._id}`}
+                          className="book"
+                        >
+                          Book Now
+                        </Link>
 
                       </div>
 
                     </div>
 
                   </article>
-                );
-              })}
 
-            </div>
-          ) : (
+                ))}
 
-            /* ==========================================
-               NO RESULTS
-            ========================================== */
-
-            <div className="no-results">
-
-              <div className="no-results-icon">
-                ⌕
               </div>
+
+            </>
+
+          )}
+
+          {/* NO ROOMS */}
+
+          {!loading && rooms.length === 0 && (
+
+            <div className="no-rooms">
 
               <h2>
                 No rooms found
               </h2>
 
               <p>
-                We couldn't find a room matching your
-                current search. Try another destination,
-                fewer guests, or different dates.
+                The rooms API did not return any rooms.
               </p>
 
-              {isSearchResult && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                >
-                  Explore All Rooms
-                </button>
-              )}
-
             </div>
+
           )}
 
         </div>
-      </section>
-    </>
-  );
-};
 
-export default Rooms;
+      </section>
+
+      {/* CSS */}
+
+      <style>{`
+
+        * {
+          box-sizing: border-box;
+        }
+
+        .rooms-page {
+          width: 100%;
+          min-height: 100vh;
+          background: #f7f8f6;
+          color: #18231d;
+          font-family:
+            Arial,
+            Helvetica,
+            sans-serif;
+        }
+
+        /* HERO */
+
+        .rooms-hero {
+          width: 100%;
+          min-height: 500px;
+
+          background-image:
+            url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=2000&q=85");
+
+          background-size: cover;
+          background-position: center;
+        }
+
+        .rooms-hero-overlay {
+          min-height: 500px;
+          width: 100%;
+
+          display: flex;
+          align-items: center;
+
+          background:
+            linear-gradient(
+              90deg,
+              rgba(10,20,15,.82),
+              rgba(10,20,15,.35),
+              rgba(10,20,15,.15)
+            );
+        }
+
+        .rooms-hero-content {
+          width: 100%;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 60px 6%;
+          color: white;
+        }
+
+        .rooms-hero-content span {
+          display: block;
+          margin-bottom: 18px;
+
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 3px;
+        }
+
+        .rooms-hero-content h1 {
+          margin: 0 0 20px;
+
+          font-size:
+            clamp(44px, 6vw, 76px);
+
+          line-height: 1.05;
+          font-weight: 700;
+        }
+
+        .rooms-hero-content p {
+          max-width: 650px;
+
+          margin: 0;
+
+          font-size: 18px;
+          line-height: 1.7;
+
+          color: rgba(255,255,255,.9);
+        }
+
+        /* SECTION */
+
+        .rooms-section {
+          padding: 90px 6%;
+        }
+
+        .rooms-container {
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+
+        /* HEADING */
+
+        .section-heading {
+          max-width: 750px;
+          margin: 0 auto 50px;
+          text-align: center;
+        }
+
+        .section-heading span {
+          color: #8b6b3f;
+
+          font-size: 12px;
+          font-weight: 800;
+
+          letter-spacing: 2px;
+        }
+
+        .section-heading h2 {
+          margin: 12px 0 16px;
+
+          font-size:
+            clamp(34px, 5vw, 54px);
+
+          line-height: 1.1;
+        }
+
+        .section-heading p {
+          margin: 0;
+
+          color: #68716b;
+
+          font-size: 17px;
+          line-height: 1.7;
+        }
+
+        /* COUNT */
+
+        .rooms-count {
+          margin-bottom: 20px;
+
+          color: #68716b;
+
+          font-size: 14px;
+        }
+
+        .rooms-count strong {
+          color: #18231d;
+        }
+
+        /* GRID */
+
+        .rooms-grid {
+          display: grid;
+
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+          gap: 28px;
+        }
+
+        /* CARD */
+
+        .room-card {
+          overflow: hidden;
+
+          background: white;
+
+          border:
+            1px solid #e2e6e1;
+
+          border-radius: 22px;
+
+          box-shadow:
+            0 12px 35px
+            rgba(24,35,29,.08);
+
+          transition:
+            transform .3s ease,
+            box-shadow .3s ease;
+        }
+
+        .room-card:hover {
+          transform:
+            translateY(-7px);
+
+          box-shadow:
+            0 22px 50px
+            rgba(24,35,29,.14);
+        }
+
+        /* IMAGE */
+
+        .room-image {
+          position: relative;
+
+          height: 260px;
+
+          overflow: hidden;
+
+          background: #dfe5df;
+        }
+
+        .room-image img {
+          width: 100%;
+          height: 100%;
+
+          display: block;
+
+          object-fit: cover;
+
+          transition:
+            transform .5s ease;
+        }
+
+        .room-card:hover
+        .room-image img {
+          transform:
+            scale(1.06);
+        }
+
+        .available {
+          position: absolute;
+
+          top: 16px;
+          left: 16px;
+
+          padding:
+            8px 13px;
+
+          background:
+            rgba(255,255,255,.95);
+
+          border-radius: 30px;
+
+          color: #28613b;
+
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        /* CONTENT */
+
+        .room-content {
+          padding: 24px;
+        }
+
+        .room-top {
+          display: flex;
+
+          justify-content:
+            space-between;
+
+          align-items:
+            flex-start;
+
+          gap: 15px;
+        }
+
+        .room-top h3 {
+          margin: 0 0 8px;
+
+          font-size: 22px;
+
+          line-height: 1.25;
+
+          color: #18231d;
+        }
+
+        .location {
+          margin: 0;
+
+          color: #8b6b3f;
+
+          font-size: 12px;
+
+          font-weight: 700;
+        }
+
+        .price {
+          text-align: right;
+
+          flex-shrink: 0;
+        }
+
+        .price strong {
+          display: block;
+
+          color: #8b6b3f;
+
+          font-size: 19px;
+        }
+
+        .price small {
+          color: #8b918d;
+
+          font-size: 11px;
+        }
+
+        .description {
+          margin: 18px 0;
+
+          color: #68716b;
+
+          font-size: 14px;
+
+          line-height: 1.65;
+        }
+
+        /* INFO */
+
+        .info {
+          display: flex;
+
+          flex-wrap: wrap;
+
+          gap: 8px;
+
+          padding-bottom: 18px;
+
+          border-bottom:
+            1px solid #eceeeb;
+        }
+
+        .info span {
+          padding:
+            8px 10px;
+
+          background:
+            #f4f6f3;
+
+          border-radius: 8px;
+
+          color: #4d5751;
+
+          font-size: 12px;
+
+          font-weight: 600;
+        }
+
+        /* AMENITIES */
+
+        .amenities {
+          display: flex;
+
+          flex-wrap: wrap;
+
+          gap: 8px;
+
+          margin:
+            17px 0 22px;
+        }
+
+        .amenities span {
+          color: #59635d;
+
+          font-size: 12px;
+        }
+
+        .amenities span:not(:last-child)::after {
+          content: "•";
+
+          margin-left: 8px;
+
+          color: #aaa;
+        }
+
+        /* BUTTONS */
+
+        .buttons {
+          display: flex;
+
+          gap: 10px;
+        }
+
+        .details,
+        .book {
+          flex: 1;
+
+          text-align: center;
+
+          padding:
+            13px 12px;
+
+          border-radius: 10px;
+
+          text-decoration: none;
+
+          font-size: 13px;
+
+          font-weight: 800;
+
+          transition: .25s ease;
+        }
+
+        .details {
+          color: #26332b;
+
+          background: white;
+
+          border:
+            1px solid #d8ddd8;
+        }
+
+        .details:hover {
+          background: #f3f5f2;
+        }
+
+        .book {
+          color: white;
+
+          background: #18231d;
+
+          border:
+            1px solid #18231d;
+        }
+
+        .book:hover {
+          background: #8b6b3f;
+
+          border-color:
+            #8b6b3f;
+        }
+
+        /* LOADING */
+
+        .loading {
+          padding: 100px 20px;
+
+          text-align: center;
+
+          color: #68716b;
+
+          font-size: 18px;
+        }
+
+        /* NO ROOMS */
+
+        .no-rooms {
+          padding: 80px 20px;
+
+          background: white;
+
+          border-radius: 20px;
+
+          text-align: center;
+        }
+
+        .no-rooms h2 {
+          margin-bottom: 10px;
+        }
+
+        .no-rooms p {
+          color: #68716b;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+
+          .rooms-grid {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
+          }
+
+        }
+
+        @media (max-width: 650px) {
+
+          .rooms-hero {
+            min-height: 430px;
+          }
+
+          .rooms-hero-overlay {
+            min-height: 430px;
+          }
+
+          .rooms-section {
+            padding: 60px 18px;
+          }
+
+          .rooms-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .room-top {
+            flex-direction: column;
+          }
+
+          .price {
+            text-align: left;
+          }
+
+          .buttons {
+            flex-direction: column;
+          }
+
+        }
+
+      `}</style>
+
+    </div>
+  );
+}
