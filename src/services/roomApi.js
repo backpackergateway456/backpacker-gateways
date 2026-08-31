@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5000/api/rooms";
+const API_URL = "https://backpacker-gateways-2.onrender.com/api/rooms";
+const API_URL = "https://backpacker-gateways-2.onrender.com/api/rooms";
 
 export const getRooms = async ({
   destination = "",
@@ -33,33 +34,25 @@ export const getRooms = async ({
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch rooms (${response.status})`
-    );
+    throw new Error(`Failed to fetch rooms (${response.status})`);
   }
 
   return await response.json();
 };
-
 
 export const getRoom = async (id) => {
   if (!id) {
     throw new Error("Room ID is required");
   }
 
-  const response = await fetch(
-    `${API_URL}/${id}`
-  );
+  const response = await fetch(`${API_URL}/${id}`);
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch room (${response.status})`
-    );
+    throw new Error(`Failed to fetch room (${response.status})`);
   }
 
   return await response.json();
 };
-
 
 export const createRoom = async (roomData) => {
   const response = await fetch(API_URL, {
@@ -74,65 +67,51 @@ export const createRoom = async (roomData) => {
 
   if (!response.ok) {
     throw new Error(
-      result?.message ||
-      `Failed to create room (${response.status})`
+      result?.message || `Failed to create room (${response.status})`
     );
   }
 
   return result;
 };
 
-
-export const updateRoom = async (
-  id,
-  roomData
-) => {
+export const updateRoom = async (id, roomData) => {
   if (!id) {
     throw new Error("Room ID is required");
   }
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(roomData),
-    }
-  );
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(roomData),
+  });
 
   const result = await response.json();
 
   if (!response.ok) {
     throw new Error(
-      result?.message ||
-      `Failed to update room (${response.status})`
+      result?.message || `Failed to update room (${response.status})`
     );
   }
 
   return result;
 };
-
 
 export const deleteRoom = async (id) => {
   if (!id) {
     throw new Error("Room ID is required");
   }
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "DELETE",
-    }
-  );
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
 
   const result = await response.json();
 
   if (!response.ok) {
     throw new Error(
-      result?.message ||
-      `Failed to delete room (${response.status})`
+      result?.message || `Failed to delete room (${response.status})`
     );
   }
 
