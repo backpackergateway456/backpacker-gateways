@@ -1,0 +1,939 @@
+/* =========================================================
+   HIMALAYAN BACKPACKER HOUSE
+   MODERN SEARCH BAR
+========================================================= */
+
+.searchbar-wrapper {
+  position: relative;
+  width: min(1120px, 92%);
+  margin: 0 auto;
+  z-index: 100;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+/* =========================================================
+   MAIN SEARCH BAR
+========================================================= */
+
+.searchbar {
+  width: 100%;
+  min-height: 78px;
+
+  display: flex;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.97);
+
+  border: 1px solid rgba(30, 38, 33, 0.1);
+  border-radius: 18px;
+
+  box-shadow:
+    0 18px 45px rgba(24, 35, 29, 0.12),
+    0 3px 12px rgba(24, 35, 29, 0.06);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  padding: 7px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   SEARCH ITEMS
+========================================================= */
+
+.search-item {
+  position: relative;
+
+  min-height: 64px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-radius: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-item:hover {
+  background: #f6f8f5;
+}
+
+.search-item.active {
+  background: #f3f6f2;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(24, 35, 29, 0.08);
+}
+
+/* =========================================================
+   DESTINATION
+========================================================= */
+
+.destination-item {
+  flex: 1.6;
+  min-width: 240px;
+}
+
+/* =========================================================
+   DATES
+========================================================= */
+
+.dates-item {
+  flex: 1.45;
+  min-width: 250px;
+}
+
+/* =========================================================
+   GUESTS
+========================================================= */
+
+.guests-item {
+  flex: 0.95;
+  min-width: 150px;
+}
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.search-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 12px;
+
+  color: #26332b;
+
+  background: #f1f4f0;
+
+  border-radius: 12px;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.search-item:hover .search-icon {
+  background: #e9eee9;
+}
+
+.search-item.active .search-icon {
+  background: #e5ebe5;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.search-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: 5px;
+}
+
+.search-label {
+  color: #1c2821;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.search-content input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  padding: 0;
+
+  background: transparent;
+
+  color: #56605a;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  font-family: inherit;
+}
+
+.search-content input::placeholder {
+  color: #7c857f;
+  opacity: 1;
+}
+
+.search-content input:focus {
+  color: #1c2821;
+}
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.search-divider {
+  width: 1px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  background: #e1e5e1;
+}
+
+/* =========================================================
+   DATE DISPLAY
+========================================================= */
+
+.date-display {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  white-space: nowrap;
+
+  color: #7b837e;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.date-display .selected {
+  color: #27332c;
+  font-weight: 700;
+}
+
+.date-arrow {
+  color: #a2a9a4;
+  font-size: 13px;
+}
+
+/* =========================================================
+   GUEST VALUE
+========================================================= */
+
+.guest-value {
+  color: #626b65;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   SEARCH BUTTON
+========================================================= */
+
+.search-button {
+  min-width: 124px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  border: none;
+  border-radius: 13px;
+
+  background: #18231d;
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 18px rgba(24, 35, 29, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-button:hover {
+  background: #8b6b3f;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 24px rgba(139, 107, 63, 0.25);
+}
+
+.search-button:active {
+  transform: translateY(0);
+}
+
+.search-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+/* =========================================================
+   SEARCH SPINNER
+========================================================= */
+
+.search-spinner {
+  width: 18px;
+  height: 18px;
+
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation: searchSpin 0.7s linear infinite;
+}
+
+@keyframes searchSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   FLOATING PANEL
+========================================================= */
+
+.search-panel {
+  position: absolute;
+
+  top: calc(100% + 12px);
+
+  left: 0;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(24, 35, 29, 0.09);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 25px 60px rgba(24, 35, 29, 0.16),
+    0 5px 20px rgba(24, 35, 29, 0.07);
+
+  overflow: hidden;
+
+  animation: panelAppear 0.18s ease-out;
+}
+
+@keyframes panelAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   DESTINATION PANEL
+========================================================= */
+
+.destination-panel {
+  width: min(430px, 92vw);
+
+  padding: 10px;
+}
+
+.panel-heading {
+  padding: 18px 18px 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.panel-heading span {
+  color: #18231d;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.panel-heading small {
+  color: #858d87;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DESTINATION LIST
+========================================================= */
+
+.destination-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.destination-option {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  padding: 12px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.destination-option:hover {
+  background: #f4f6f3;
+  transform: translateX(2px);
+}
+
+.destination-option-icon {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 12px;
+
+  color: #344139;
+
+  background: #f0f3ef;
+
+  border-radius: 10px;
+}
+
+.destination-option-text {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.destination-option-text strong {
+  color: #243028;
+
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.destination-option-text small {
+  color: #8a918c;
+
+  font-size: 11px;
+}
+
+.destination-option-arrow {
+  margin-left: auto;
+
+  color: #9ba29d;
+
+  font-size: 17px;
+
+  transition: transform 0.18s ease;
+}
+
+.destination-option:hover .destination-option-arrow {
+  transform: translateX(3px);
+  color: #8b6b3f;
+}
+
+/* =========================================================
+   EMPTY DESTINATION
+========================================================= */
+
+.empty-destination {
+  padding: 28px 18px 30px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  gap: 6px;
+}
+
+.empty-destination strong {
+  color: #26322b;
+  font-size: 14px;
+}
+
+.empty-destination span {
+  color: #8a918c;
+  font-size: 12px;
+}
+
+/* =========================================================
+   DATE PANEL
+========================================================= */
+
+.date-panel {
+  width: min(520px, 92vw);
+
+  padding: 10px 18px 20px;
+}
+
+.date-input-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+  padding: 10px 0;
+}
+
+.date-box {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: 14px;
+
+  border: 1px solid #e0e4e0;
+
+  border-radius: 12px;
+
+  background: #fafbfa;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.date-box:focus-within {
+  border-color: #8b6b3f;
+  background: #ffffff;
+}
+
+.date-box label {
+  color: #727a74;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+}
+
+.date-box input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #26322b;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.date-hint {
+  padding: 8px 2px 0;
+
+  color: #909791;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   GUEST PANEL
+========================================================= */
+
+.guest-panel {
+  width: min(340px, 92vw);
+
+  left: auto;
+  right: 125px;
+
+  padding: 10px 18px 20px;
+}
+
+.guest-control {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 15px;
+
+  border-radius: 13px;
+
+  background: #f7f8f6;
+}
+
+.guest-description {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.guest-description strong {
+  color: #27332c;
+
+  font-size: 14px;
+}
+
+.guest-description span {
+  color: #8a918c;
+
+  font-size: 11px;
+}
+
+.guest-counter {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.guest-counter button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d9ded9;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #26332b;
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.guest-counter button:hover:not(:disabled) {
+  background: #18231d;
+  border-color: #18231d;
+
+  color: #ffffff;
+
+  transform: scale(1.05);
+}
+
+.guest-counter button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.guest-counter strong {
+  min-width: 22px;
+
+  text-align: center;
+
+  color: #26332b;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.search-error {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: max-content;
+  max-width: 90vw;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 11px 15px;
+
+  border-radius: 10px;
+
+  background: #fff4f1;
+
+  border: 1px solid #f1d2cb;
+
+  color: #9b4a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  box-shadow:
+    0 10px 25px rgba(80, 30, 20, 0.08);
+
+  z-index: 10;
+}
+
+.search-error span {
+  width: 19px;
+  height: 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #9b4a3f;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 950px) {
+  .searchbar {
+    flex-wrap: wrap;
+
+    padding: 8px;
+  }
+
+  .destination-item {
+    flex: 1 1 45%;
+  }
+
+  .dates-item {
+    flex: 1 1 45%;
+  }
+
+  .guests-item {
+    flex: 1 1 25%;
+  }
+
+  .search-button {
+    flex: 1 1 25%;
+  }
+
+  .search-divider {
+    display: none;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+  .searchbar-wrapper {
+    width: calc(100% - 30px);
+  }
+
+  .searchbar {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 4px;
+
+    padding: 8px;
+
+    border-radius: 17px;
+  }
+
+  .search-item {
+    width: 100%;
+    min-height: 62px;
+
+    box-sizing: border-box;
+
+    padding: 0 14px;
+  }
+
+  .destination-item,
+  .dates-item,
+  .guests-item {
+    flex: none;
+
+    min-width: 0;
+  }
+
+  .search-divider {
+    display: block;
+
+    width: calc(100% - 28px);
+    height: 1px;
+
+    margin: 0 auto;
+
+    background: #e6e9e6;
+  }
+
+  .search-button {
+    width: 100%;
+
+    min-height: 54px;
+    height: 54px;
+
+    margin-top: 4px;
+
+    border-radius: 12px;
+  }
+
+  .search-panel {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    width: auto;
+
+    max-width: none;
+  }
+
+  .destination-panel {
+    width: auto;
+  }
+
+  .date-panel {
+    width: auto;
+  }
+
+  .guest-panel {
+    left: 0;
+    right: 0;
+
+    width: auto;
+  }
+
+  .date-input-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-error {
+    width: calc(100% - 20px);
+
+    box-sizing: border-box;
+
+    justify-content: center;
+
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 390px) {
+  .searchbar-wrapper {
+    width: calc(100% - 20px);
+  }
+
+  .search-item {
+    min-height: 58px;
+
+    padding: 0 11px;
+  }
+
+  .search-icon {
+    width: 37px;
+    height: 37px;
+
+    margin-right: 10px;
+  }
+
+  .search-label {
+    font-size: 10px;
+  }
+
+  .search-content input,
+  .guest-value,
+  .date-display {
+    font-size: 12px;
+  }
+
+  .destination-option {
+    padding: 10px;
+  }
+
+  .destination-option-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.search-button:focus-visible,
+.destination-option:focus-visible,
+.guest-counter button:focus-visible,
+.search-content input:focus-visible,
+.date-box input:focus-visible {
+  outline: 2px solid #8b6b3f;
+  outline-offset: 2px;
+}
