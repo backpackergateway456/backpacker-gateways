@@ -4,64 +4,33 @@ import Home from "./pages/Home";
 import Rooms from "./pages/Rooms";
 import RoomDetails from "./pages/RoomDetails";
 import Booking from "./pages/Booking";
+import AdminLogin from "./pages/AdminLogin";
 import AdminRooms from "./pages/AdminRooms";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
+return ( <BrowserRouter> <Routes>
+<Route path="/" element={<Home />} />
 
-        {/* =========================================
-            HOME
-        ========================================= */}
+```
+    <Route path="/rooms" element={<Rooms />} />
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+    <Route path="/rooms/:id" element={<RoomDetails />} />
 
-        {/* =========================================
-            ALL ROOMS
-        ========================================= */}
+    <Route path="/booking" element={<Booking />} />
 
-        <Route
-          path="/rooms"
-          element={<Rooms />}
-        />
+    <Route path="/admin" element={<AdminLogin />} />
 
-        {/* =========================================
-            SINGLE ROOM DETAILS
-            Example:
-            /rooms/6a8a9fa9747dd7c94ad3712f
-        ========================================= */}
+    <Route
+      path="/admin/rooms"
+      element={
+        <ProtectedRoute>
+          <AdminRooms />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
+</BrowserRouter>
 
-        <Route
-          path="/rooms/:id"
-          element={<RoomDetails />}
-        />
-
-        {/* =========================================
-            BOOKING
-            Example:
-            /booking?room=ROOM_ID
-        ========================================= */}
-
-        <Route
-          path="/booking"
-          element={<Booking />}
-        />
-
-        {/* =========================================
-            ADMIN ROOM MANAGEMENT
-            Add / Edit / Delete Rooms
-        ========================================= */}
-
-        <Route
-          path="/admin/rooms"
-          element={<AdminRooms />}
-        />
-
-      </Routes>
-    </BrowserRouter>
-  );
+);
 }
