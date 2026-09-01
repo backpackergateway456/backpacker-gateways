@@ -1,5 +1,5 @@
 const API_URL = "https://backpacker-gateways-2.onrender.com/api/rooms";
-const API_URL = "https://backpacker-gateways-2.onrender.com/api/rooms";
+
 
 export const getRooms = async ({
   destination = "",
