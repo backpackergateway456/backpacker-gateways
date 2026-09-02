@@ -707,7 +707,7 @@ export default function Hero() {
         <div className="category-container">
           {categories.map((category) => (
             <Link
-              to={category.title === "Gear Rental" ? "/gear" : "/rooms"}
+              to={category.title === "Tourist Vehicle Rental" ? "/vehicles" : "/rooms"}
               className="category-item"
               key={category.title}
             >
