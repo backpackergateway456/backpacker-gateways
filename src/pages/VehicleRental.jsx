@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./VehicleRental.css";
 
@@ -17,7 +18,6 @@ const vehicles = [
       "Comfortable private car for airport transfers, Kathmandu sightseeing and private journeys.",
     popular: false,
   },
-
   {
     id: 2,
     name: "Tourist 4WD Jeep",
@@ -33,7 +33,6 @@ const vehicles = [
       "Reliable four-wheel-drive vehicle for mountain roads, adventure routes and long-distance travel.",
     popular: true,
   },
-
   {
     id: 3,
     name: "Toyota Innova Crysta",
@@ -49,7 +48,6 @@ const vehicles = [
       "Spacious and premium transport for families, sightseeing and comfortable private tours.",
     popular: false,
   },
-
   {
     id: 4,
     name: "Toyota Hiace",
@@ -65,7 +63,6 @@ const vehicles = [
       "A spacious tourist van ideal for families, friends and group journeys across Nepal.",
     popular: false,
   },
-
   {
     id: 5,
     name: "Mahindra Scorpio",
@@ -81,7 +78,6 @@ const vehicles = [
       "Reliable and comfortable SUV for mountain destinations and adventurous road trips.",
     popular: false,
   },
-
   {
     id: 6,
     name: "Luxury Tourist Bus",
@@ -100,290 +96,279 @@ const vehicles = [
 ];
 
 export default function VehicleRental() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [seatFilter, setSeatFilter] = useState("");
+
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const matchesSearch = vehicle.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesType =
+      vehicleType === "" || vehicle.type === vehicleType;
+
+    const matchesSeats =
+      seatFilter === "" || vehicle.seats === seatFilter;
+
+    return matchesSearch && matchesType && matchesSeats;
+  });
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setVehicleType("");
+    setSeatFilter("");
+  };
+
   return (
     <main className="vehicle-page">
 
-      {/* ================= HERO ================= */}
-
-      <section className="vehicle-hero">
-        <div className="vehicle-hero-overlay" />
-
-        <div className="vehicle-hero-pattern">
-          <span />
-          <span />
-          <span />
-        </div>
-
-        <div className="vehicle-container vehicle-hero-layout">
-
-          <div className="vehicle-hero-content">
-
-            <div className="vehicle-eyebrow">
-              <span className="eyebrow-dot" />
-              BACKPACKER GATEWAYS
-            </div>
-
-            <h1>
-              Explore Nepal.
-              <br />
-              <span>Your Way.</span>
-            </h1>
-
-            <p>
-              Premium tourist vehicles with professional drivers
-              for airport transfers, private tours and unforgettable
-              journeys across Nepal.
-            </p>
-
-            <div className="vehicle-hero-actions">
-
-              <a
-                href="#vehicles"
-                className="vehicle-primary-btn"
-              >
-                Explore Our Fleet
-                <span>→</span>
-              </a>
-
-              <a
-                href="#contact"
-                className="vehicle-secondary-btn"
-              >
-                Plan Your Journey
-              </a>
-
-            </div>
-
-          </div>
-
-          {/* HERO FLOATING CARD */}
-
-          <div className="hero-vehicle-card">
-
-            <div className="hero-card-top">
-              <span>PREMIUM TRAVEL</span>
-              <strong>24/7</strong>
-            </div>
-
-            <div className="hero-card-main">
-
-              <div className="hero-card-icon">
-                🚐
-              </div>
-
-              <div>
-                <strong>Travel Made Easy</strong>
-
-                <span>
-                  Safe · Comfortable · Reliable
-                </span>
-              </div>
-
-            </div>
-
-            <div className="hero-card-line" />
-
-            <div className="hero-card-stats">
-
-              <div>
-                <strong>6+</strong>
-                <span>Vehicle Types</span>
-              </div>
-
-              <div>
-                <strong>All Nepal</strong>
-                <span>Travel Coverage</span>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* HERO TRUST BAR */}
-
-        <div className="vehicle-hero-bottom">
-
-          <div>
-
-            <span className="trust-icon">
-              ✦
-            </span>
-
-            <div>
-              <strong>Airport Transfers</strong>
-              <span>Pickup & drop service</span>
-            </div>
-
-          </div>
-
-
-          <div>
-
-            <span className="trust-icon">
-              ✦
-            </span>
-
-            <div>
-              <strong>Professional Drivers</strong>
-              <span>Experienced local experts</span>
-            </div>
-
-          </div>
-
-
-          <div>
-
-            <span className="trust-icon">
-              ✦
-            </span>
-
-            <div>
-              <strong>Travel Across Nepal</strong>
-              <span>Your journey, your schedule</span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ================= INTRO ================= */}
-
-      <section className="vehicle-intro">
-
-        <div className="vehicle-container">
-
-          <div className="vehicle-intro-grid">
-
-            <div className="vehicle-intro-title">
-
-              <span className="vehicle-section-label">
-                TOURIST VEHICLE RENTAL
-              </span>
-
-              <h2>
-                Every journey
-                <br />
-                deserves the
-                <span> right ride.</span>
-              </h2>
-
-            </div>
-
-
-            <div className="vehicle-intro-text">
-
-              <p>
-                Whether you are arriving in Kathmandu,
-                exploring cultural destinations or travelling
-                deep into the Himalayas, we have a vehicle
-                designed for your journey.
-              </p>
-
-              <div className="intro-mini-features">
-
-                <span>✓ Transparent Pricing</span>
-
-                <span>✓ Private Vehicles</span>
-
-                <span>✓ Experienced Drivers</span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ================= VEHICLE LIST ================= */}
+      {/* ================= VEHICLE COLLECTION ================= */}
 
       <section
         className="vehicle-list-section"
         id="vehicles"
       >
-
         <div className="vehicle-container">
+
+          {/* HEADING */}
 
           <div className="vehicle-section-heading">
 
             <div>
-
               <span className="vehicle-section-label">
-                OUR VEHICLE COLLECTION
+                TOURIST VEHICLE RENTAL
               </span>
 
-              <h2>
+              <h1>
                 Find your perfect ride
-              </h2>
-
+              </h1>
             </div>
 
-
             <div className="fleet-info">
-
               <span>
-                From solo travellers to large groups.
+                Safe, comfortable and reliable travel across Nepal.
               </span>
 
               <strong>
-                6 Premium Vehicle Options
+                6 Vehicle Options
               </strong>
+            </div>
+
+          </div>
+
+
+          {/* ================= SEARCH ================= */}
+
+          <div className="vehicle-search-section">
+
+            <div className="vehicle-search-header">
+              <div>
+                <span className="vehicle-section-label">
+                  FIND YOUR VEHICLE
+                </span>
+
+                <h2>
+                  Search your journey
+                </h2>
+              </div>
+
+              <button
+                className="clear-filter-btn"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+
+            <div className="vehicle-search-grid">
+
+              {/* SEARCH NAME */}
+
+              <div className="vehicle-search-field">
+                <label>
+                  Search Vehicle
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Toyota, Jeep, Car..."
+                  value={searchTerm}
+                  onChange={(e) =>
+                    setSearchTerm(e.target.value)
+                  }
+                />
+              </div>
+
+
+              {/* VEHICLE TYPE */}
+
+              <div className="vehicle-search-field">
+                <label>
+                  Vehicle Type
+                </label>
+
+                <select
+                  value={vehicleType}
+                  onChange={(e) =>
+                    setVehicleType(e.target.value)
+                  }
+                >
+                  <option value="">
+                    All Vehicle Types
+                  </option>
+
+                  <option value="PRIVATE CAR">
+                    Private Car
+                  </option>
+
+                  <option value="4X4 JEEP">
+                    4x4 Jeep
+                  </option>
+
+                  <option value="PREMIUM MPV">
+                    Premium MPV
+                  </option>
+
+                  <option value="TOURIST VAN">
+                    Tourist Van
+                  </option>
+
+                  <option value="SUV / 4X4">
+                    SUV / 4x4
+                  </option>
+
+                  <option value="GROUP COACH">
+                    Group Coach
+                  </option>
+                </select>
+              </div>
+
+
+              {/* SEATS */}
+
+              <div className="vehicle-search-field">
+                <label>
+                  Passengers
+                </label>
+
+                <select
+                  value={seatFilter}
+                  onChange={(e) =>
+                    setSeatFilter(e.target.value)
+                  }
+                >
+                  <option value="">
+                    Any Group Size
+                  </option>
+
+                  <option value="4 Seats">
+                    1–4 People
+                  </option>
+
+                  <option value="6–7 Seats">
+                    5–7 People
+                  </option>
+
+                  <option value="12–14 Seats">
+                    8–14 People
+                  </option>
+
+                  <option value="25–35 Seats">
+                    Large Group
+                  </option>
+                </select>
+              </div>
+
+
+              {/* SEARCH BUTTON */}
+
+              <div className="vehicle-search-action">
+
+                <button
+                  className="vehicle-primary-btn"
+                  onClick={() =>
+                    document
+                      .getElementById("vehicle-results")
+                      ?.scrollIntoView({
+                        behavior: "smooth",
+                      })
+                  }
+                >
+                  Search Vehicles
+                  <span>→</span>
+                </button>
+
+              </div>
 
             </div>
 
           </div>
 
 
-          <div className="vehicle-grid">
+          {/* RESULT INFO */}
 
-            {vehicles.map((vehicle) => (
-
-              <article
-                className="vehicle-card"
-                key={vehicle.id}
-              >
-
-                <div className="vehicle-image-wrap">
-
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.name}
-                    loading="lazy"
-                  />
-
-                  <div className="vehicle-image-overlay" />
-
-
-                  <span className="vehicle-type">
-                    {vehicle.type}
-                  </span>
+          <div
+            className="vehicle-results-info"
+            id="vehicle-results"
+          >
+            <span>
+              Showing{" "}
+              <strong>
+                {filteredVehicles.length}
+              </strong>{" "}
+              vehicle
+              {filteredVehicles.length !== 1
+                ? "s"
+                : ""}
+            </span>
+          </div>
 
 
-                  {vehicle.popular && (
+          {/* ================= VEHICLE GRID ================= */}
 
-                    <span className="popular-badge">
-                      Most Popular
+          {filteredVehicles.length > 0 ? (
+
+            <div className="vehicle-grid">
+
+              {filteredVehicles.map((vehicle) => (
+
+                <article
+                  className="vehicle-card"
+                  key={vehicle.id}
+                >
+
+                  {/* IMAGE */}
+
+                  <div className="vehicle-image-wrap">
+
+                    <img
+                      src={vehicle.image}
+                      alt={vehicle.name}
+                      loading="lazy"
+                    />
+
+                    <div className="vehicle-image-overlay" />
+
+                    <span className="vehicle-type">
+                      {vehicle.type}
                     </span>
 
-                  )}
+                    {vehicle.popular && (
+                      <span className="popular-badge">
+                        Most Popular
+                      </span>
+                    )}
 
-                </div>
+                  </div>
 
 
-                <div className="vehicle-card-content">
+                  {/* CONTENT */}
 
-                  <div className="vehicle-card-title">
+                  <div className="vehicle-card-content">
 
-                    <div>
+                    <div className="vehicle-card-title">
 
                       <h3>
                         {vehicle.name}
@@ -395,186 +380,115 @@ export default function VehicleRental() {
 
                     </div>
 
-                  </div>
 
+                    {/* FEATURES */}
 
-                  <div className="vehicle-features">
-
-                    <span>
-                      👥 {vehicle.seats}
-                    </span>
-
-                    <span>
-                      ✓ {vehicle.service}
-                    </span>
-
-                    <span>
-                      ❄ AC
-                    </span>
-
-                  </div>
-
-
-                  <div className="vehicle-pricing">
-
-                    <div className="vehicle-price-box">
+                    <div className="vehicle-features">
 
                       <span>
-                        Airport Transfer
+                        👥 {vehicle.seats}
                       </span>
 
-                      <strong>
-                        {vehicle.airport}
-                      </strong>
+                      <span>
+                        ✓ {vehicle.service}
+                      </span>
+
+                      <span>
+                        ❄ AC
+                      </span>
 
                     </div>
 
 
-                    <div className="vehicle-price-box">
+                    {/* PRICING */}
 
-                      <span>
-                        Full Day Rental
-                      </span>
+                    <div className="vehicle-pricing">
 
-                      <strong>
-                        {vehicle.fullDay}
-                      </strong>
+                      <div className="vehicle-price-box">
+
+                        <span>
+                          Airport Transfer
+                        </span>
+
+                        <strong>
+                          {vehicle.airport}
+                        </strong>
+
+                      </div>
+
+
+                      <div className="vehicle-price-box">
+
+                        <span>
+                          Full Day Rental
+                        </span>
+
+                        <strong>
+                          {vehicle.fullDay}
+                        </strong>
+
+                      </div>
 
                     </div>
 
+
+                    {/* DURATION */}
+
+                    <div className="vehicle-duration">
+
+                      <span>
+                        ◷
+                      </span>
+
+                      {vehicle.duration}
+
+                    </div>
+
+
+                    {/* BOOK BUTTON */}
+
+                    <a
+                      href="#contact"
+                      className="vehicle-book-btn"
+                    >
+                      Check Availability
+
+                      <span>
+                        →
+                      </span>
+
+                    </a>
+
                   </div>
 
+                </article>
 
-                  <div className="vehicle-duration">
-
-                    <span>
-                      ◷
-                    </span>
-
-                    {vehicle.duration}
-
-                  </div>
-
-
-                  <a
-                    href="#contact"
-                    className="vehicle-book-btn"
-                  >
-
-                    Check Availability
-
-                    <span>
-                      →
-                    </span>
-
-                  </a>
-
-                </div>
-
-              </article>
-
-            ))}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ================= SERVICES ================= */}
-
-      <section className="vehicle-services">
-
-        <div className="vehicle-container">
-
-          <div className="services-heading">
-
-            <span className="vehicle-section-label">
-              MORE THAN TRANSPORT
-            </span>
-
-            <h2>
-              Travel with confidence.
-            </h2>
-
-          </div>
-
-
-          <div className="vehicle-services-grid">
-
-            <div>
-
-              <span className="service-number">
-                01
-              </span>
-
-              <h3>
-                Airport Transfers
-              </h3>
-
-              <p>
-                Smooth and reliable airport pickup
-                and drop service.
-              </p>
+              ))}
 
             </div>
 
+          ) : (
 
-            <div>
-
-              <span className="service-number">
-                02
-              </span>
+            <div className="no-vehicle-found">
 
               <h3>
-                Private Tours
+                No vehicles found
               </h3>
 
               <p>
-                Explore Nepal at your own pace with
-                your own private vehicle.
+                Try changing your search or filters.
               </p>
+
+              <button
+                className="vehicle-secondary-btn"
+                onClick={clearFilters}
+              >
+                View All Vehicles
+              </button>
 
             </div>
 
-
-            <div>
-
-              <span className="service-number">
-                03
-              </span>
-
-              <h3>
-                Group Travel
-              </h3>
-
-              <p>
-                Comfortable transportation for families,
-                friends and larger groups.
-              </p>
-
-            </div>
-
-
-            <div>
-
-              <span className="service-number">
-                04
-              </span>
-
-              <h3>
-                Himalayan Routes
-              </h3>
-
-              <p>
-                Reliable vehicles for mountain roads
-                and adventurous destinations.
-              </p>
-
-            </div>
-
-          </div>
+          )}
 
         </div>
 
@@ -588,31 +502,26 @@ export default function VehicleRental() {
         id="contact"
       >
 
-        <div className="vehicle-cta-pattern">
-          <span />
-          <span />
-        </div>
-
         <div className="vehicle-container">
 
           <div className="vehicle-cta-box">
 
             <div className="vehicle-cta-content">
 
-              <span className="vehicle-eyebrow">
-                READY FOR THE ROAD?
+              <span className="vehicle-section-label">
+                READY TO TRAVEL?
               </span>
 
               <h2>
-                Nepal is waiting.
+                Your journey starts
                 <br />
-                <span>Let's get moving.</span>
+                with the right ride.
               </h2>
 
               <p>
-                Tell us your travel date, destination
-                and group size. Our team will help you
-                choose the perfect vehicle.
+                Tell us your destination, travel date and
+                group size. We'll help you find the perfect
+                vehicle for your Nepal journey.
               </p>
 
             </div>
@@ -626,10 +535,9 @@ export default function VehicleRental() {
                 target="_blank"
                 rel="noreferrer"
               >
-                WhatsApp Us
+                Plan Your Journey
                 <span>↗</span>
               </a>
-
 
               <Link
                 to="/"
@@ -643,11 +551,11 @@ export default function VehicleRental() {
           </div>
 
 
-          {/* FOOTER STYLE MINI INFO */}
+          {/* ================= COMPACT FOOTER ================= */}
 
-          <div className="vehicle-footer-info">
+          <footer className="vehicle-mini-footer">
 
-            <div>
+            <div className="mini-footer-brand">
 
               <strong>
                 Backpacker Gateways
@@ -660,7 +568,7 @@ export default function VehicleRental() {
             </div>
 
 
-            <div className="vehicle-footer-links">
+            <div className="mini-footer-links">
 
               <Link to="/">
                 Home
@@ -681,11 +589,11 @@ export default function VehicleRental() {
             </div>
 
 
-            <div className="vehicle-footer-copy">
+            <div className="mini-footer-copy">
               © 2026 Backpacker Gateways
             </div>
 
-          </div>
+          </footer>
 
         </div>
 
