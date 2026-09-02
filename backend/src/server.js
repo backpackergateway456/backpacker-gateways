@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const gearRoutes = require("./routes/gearRoutes");
 
 const app = express();
 
@@ -22,27 +23,30 @@ app.use("/api/bookings", bookingRoutes);
 // Admin API
 app.use("/api/admin", adminRoutes);
 
+// Gear API
+app.use("/api/gears", gearRoutes);
+
 // Home route
 app.get("/", (req, res) => {
-res.json({
-success: true,
-message: "Himalayan Backpacker House API is running",
-});
+  res.json({
+    success: true,
+    message: "Himalayan Backpacker House API is running",
+  });
 });
 
 const PORT = process.env.PORT || 5000;
 
 connectDB()
-.then(() => {
-app.listen(PORT, () => {
-console.log(
-`Backend running on http://localhost:${PORT}`
-);
-});
-})
-.catch((error) => {
-console.error(
-"Server startup failed:",
-error.message
-);
-});
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(
+        `Backend running on http://localhost:${PORT}`
+      );
+    });
+  })
+  .catch((error) => {
+    console.error(
+      "Server startup failed:",
+      error.message
+    );
+  });

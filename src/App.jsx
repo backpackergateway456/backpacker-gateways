@@ -5,6 +5,7 @@ import Rooms from "./pages/Rooms";
 import RoomDetails from "./pages/RoomDetails";
 import Booking from "./pages/Booking";
 import Gear from "./pages/Gear";
+import VehicleRental from "./pages/VehicleRental";
 import AdminLogin from "./pages/AdminLogin";
 import AdminRooms from "./pages/AdminRooms";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -13,16 +14,22 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* HOME */}
         <Route path="/" element={<Home />} />
 
+        {/* ROOMS */}
         <Route path="/rooms" element={<Rooms />} />
 
         <Route path="/rooms/:id" element={<RoomDetails />} />
 
+        {/* BOOKING */}
         <Route path="/booking" element={<Booking />} />
 
         {/* GEAR RENTAL */}
         <Route path="/gear" element={<Gear />} />
+
+        {/* TOURIST VEHICLE RENTAL */}
+        <Route path="/vehicles" element={<VehicleRental />} />
 
         {/* ADMIN */}
         <Route path="/admin" element={<AdminLogin />} />

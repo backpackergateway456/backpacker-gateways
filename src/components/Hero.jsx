@@ -98,6 +98,12 @@ const categories = [
     title: "Hiking Trails",
     subtitle: "Find your trail",
   },
+  {
+  icon: "🚐",
+  title: "Tourist Vehicle Rental",
+  subtitle: "Travel Nepal Comfortably",
+  link: "/vehicles",
+}
 ];
 
 const hotels = [
