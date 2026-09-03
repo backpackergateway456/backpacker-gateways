@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+
 import {
   getRooms,
   createRoom,
@@ -143,14 +146,17 @@ export default function AdminRooms() {
         price: Number(form.price),
         capacity: Number(form.capacity),
         beds: form.beds,
+
         amenities: form.amenities
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean),
+
         images: form.images
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean),
+
         available: form.available,
       };
 
@@ -211,7 +217,7 @@ export default function AdminRooms() {
   };
 
   /* =========================
-     NEW COMMUNITY POST
+     COMMUNITY POST FORM
   ========================= */
 
   const handleCommunityChange = (e) => {
@@ -220,6 +226,13 @@ export default function AdminRooms() {
     setCommunityForm({
       ...communityForm,
       [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleContentChange = (value) => {
+    setCommunityForm({
+      ...communityForm,
+      content: value,
     });
   };
 
@@ -243,9 +256,11 @@ export default function AdminRooms() {
 
       const response = await fetch(`${API_URL}/api/community`, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify(communityForm),
       });
 
@@ -282,9 +297,11 @@ export default function AdminRooms() {
         `${API_URL}/api/community/${post._id}`,
         {
           method: "PUT",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify({
             status,
           }),
@@ -372,6 +389,35 @@ export default function AdminRooms() {
     return post.status || "pending";
   };
 
+  /* =========================
+     RICH TEXT EDITOR
+  ========================= */
+
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ align: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["blockquote"],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "align",
+    "list",
+    "bullet",
+    "blockquote",
+    "link",
+  ];
+
   return (
     <div className="admin-page">
       <div className="admin-container">
@@ -379,6 +425,7 @@ export default function AdminRooms() {
         {/* ================= HEADER ================= */}
 
         <div className="admin-header">
+
           <div>
             <span>BACKPACKER GATEWAYS</span>
 
@@ -398,9 +445,10 @@ export default function AdminRooms() {
           >
             Refresh Dashboard
           </button>
+
         </div>
 
-        {/* ================= ROOMS ================= */}
+        {/* ================= ROOM MANAGEMENT ================= */}
 
         <div className="section-label">
           ROOM MANAGEMENT
@@ -417,6 +465,7 @@ export default function AdminRooms() {
             <div className="form-grid">
 
               <div className="field">
+
                 <label>Room / Hotel Name</label>
 
                 <input
@@ -426,9 +475,11 @@ export default function AdminRooms() {
                   placeholder="Everest View Mountain Lodge"
                   required
                 />
+
               </div>
 
               <div className="field">
+
                 <label>Destination</label>
 
                 <input
@@ -438,9 +489,11 @@ export default function AdminRooms() {
                   placeholder="Khumjung, Everest Region"
                   required
                 />
+
               </div>
 
               <div className="field">
+
                 <label>Price Per Night (NPR)</label>
 
                 <input
@@ -451,9 +504,11 @@ export default function AdminRooms() {
                   placeholder="3200"
                   required
                 />
+
               </div>
 
               <div className="field">
+
                 <label>Guest Capacity</label>
 
                 <input
@@ -464,9 +519,11 @@ export default function AdminRooms() {
                   placeholder="2"
                   required
                 />
+
               </div>
 
               <div className="field">
+
                 <label>Beds</label>
 
                 <input
@@ -475,9 +532,11 @@ export default function AdminRooms() {
                   onChange={handleChange}
                   placeholder="1 Double Bed"
                 />
+
               </div>
 
               <div className="field">
+
                 <label>Image URL</label>
 
                 <input
@@ -486,9 +545,11 @@ export default function AdminRooms() {
                   onChange={handleChange}
                   placeholder="https://..."
                 />
+
               </div>
 
               <div className="field full">
+
                 <label>Description</label>
 
                 <textarea
@@ -499,9 +560,11 @@ export default function AdminRooms() {
                   rows="5"
                   required
                 />
+
               </div>
 
               <div className="field full">
+
                 <label>Amenities</label>
 
                 <input
@@ -514,11 +577,13 @@ export default function AdminRooms() {
                 <small>
                   Separate amenities using commas.
                 </small>
+
               </div>
 
               <div className="available-field">
 
                 <label>
+
                   <input
                     type="checkbox"
                     name="available"
@@ -527,6 +592,7 @@ export default function AdminRooms() {
                   />
 
                   Room Available
+
                 </label>
 
               </div>
@@ -545,6 +611,7 @@ export default function AdminRooms() {
               </button>
 
               {editingId && (
+
                 <button
                   type="button"
                   className="cancel-btn"
@@ -552,11 +619,13 @@ export default function AdminRooms() {
                 >
                   Cancel Edit
                 </button>
+
               )}
 
             </div>
 
           </form>
+
         </div>
 
         {/* ================= EXISTING ROOMS ================= */}
@@ -564,22 +633,29 @@ export default function AdminRooms() {
         <div className="rooms-admin-section">
 
           <div className="rooms-title">
+
             <h2>Existing Rooms</h2>
 
             <span>
               {rooms.length} rooms
             </span>
+
           </div>
 
           {loading ? (
+
             <div className="loading">
               Loading rooms...
             </div>
+
           ) : rooms.length === 0 ? (
+
             <div className="empty">
               No rooms found.
             </div>
+
           ) : (
+
             <div className="admin-rooms-grid">
 
               {rooms.map((room) => (
@@ -653,6 +729,7 @@ export default function AdminRooms() {
               ))}
 
             </div>
+
           )}
 
         </div>
@@ -664,6 +741,7 @@ export default function AdminRooms() {
           <div className="community-header">
 
             <div>
+
               <div className="section-label">
                 COMMUNITY MANAGEMENT
               </div>
@@ -673,6 +751,7 @@ export default function AdminRooms() {
               <p>
                 Create, review and manage community posts.
               </p>
+
             </div>
 
             <button
@@ -684,12 +763,14 @@ export default function AdminRooms() {
 
           </div>
 
-          {/* ================= NEW COMMUNITY POST ================= */}
+          {/* ================= CREATE NEW POST ================= */}
 
           <div className="community-create-card">
 
             <div className="create-post-heading">
+
               <div>
+
                 <span className="create-label">
                   ADMIN POST
                 </span>
@@ -700,7 +781,9 @@ export default function AdminRooms() {
                   Publish a new story, travel update,
                   guide or community announcement.
                 </p>
+
               </div>
+
             </div>
 
             <form
@@ -711,6 +794,7 @@ export default function AdminRooms() {
               <div className="community-form-grid">
 
                 <div className="field">
+
                   <label>Post Title</label>
 
                   <input
@@ -720,9 +804,11 @@ export default function AdminRooms() {
                     placeholder="10 Things to Know Before Everest Base Camp"
                     required
                   />
+
                 </div>
 
                 <div className="field">
+
                   <label>Category</label>
 
                   <select
@@ -730,6 +816,7 @@ export default function AdminRooms() {
                     value={communityForm.category}
                     onChange={handleCommunityChange}
                   >
+
                     <option value="Travel">
                       Travel
                     </option>
@@ -757,10 +844,13 @@ export default function AdminRooms() {
                     <option value="Community">
                       Community
                     </option>
+
                   </select>
+
                 </div>
 
                 <div className="field">
+
                   <label>Author</label>
 
                   <input
@@ -769,9 +859,11 @@ export default function AdminRooms() {
                     onChange={handleCommunityChange}
                     placeholder="Backpacker Gateways"
                   />
+
                 </div>
 
                 <div className="field">
+
                   <label>Location</label>
 
                   <input
@@ -780,9 +872,11 @@ export default function AdminRooms() {
                     onChange={handleCommunityChange}
                     placeholder="Nepal"
                   />
+
                 </div>
 
                 <div className="field full">
+
                   <label>Image URL</label>
 
                   <input
@@ -795,24 +889,39 @@ export default function AdminRooms() {
                   <small>
                     Add a public image URL for the post.
                   </small>
+
                 </div>
 
+                {/* ================= RICH TEXT EDITOR ================= */}
+
                 <div className="field full">
+
                   <label>Post Content</label>
 
-                  <textarea
-                    name="content"
-                    value={communityForm.content}
-                    onChange={handleCommunityChange}
-                    placeholder="Write your community post here..."
-                    rows="8"
-                    required
-                  />
+                  <div className="rich-editor">
+
+                    <ReactQuill
+                      theme="snow"
+                      value={communityForm.content}
+                      onChange={handleContentChange}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      placeholder="Write your community post here..."
+                    />
+
+                  </div>
+
+                  <small className="editor-help">
+                    Use the toolbar to add headings, bold text,
+                    lists and text alignment.
+                  </small>
+
                 </div>
 
                 <div className="featured-field">
 
                   <label>
+
                     <input
                       type="checkbox"
                       name="featured"
@@ -821,6 +930,7 @@ export default function AdminRooms() {
                     />
 
                     Feature this post
+
                   </label>
 
                 </div>
@@ -910,23 +1020,30 @@ export default function AdminRooms() {
                       </h3>
 
                       {post.author && (
+
                         <p className="post-author">
                           By {post.author}
                         </p>
+
                       )}
 
                       {post.category && (
+
                         <p className="post-category">
                           {post.category}
                           {post.location
                             ? ` • ${post.location}`
                             : ""}
                         </p>
+
                       )}
 
-                      <p className="post-text">
-                        {getPostText(post)}
-                      </p>
+                      <div
+                        className="post-text"
+                        dangerouslySetInnerHTML={{
+                          __html: getPostText(post),
+                        }}
+                      />
 
                       <div className="post-actions">
 
@@ -1309,6 +1426,71 @@ export default function AdminRooms() {
           font-size: 14px;
         }
 
+        /* ================= RICH EDITOR ================= */
+
+        .rich-editor {
+          width: 100%;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        .rich-editor .ql-toolbar {
+          border: 1px solid #d8ded8;
+          border-radius: 10px 10px 0 0;
+          background: #f7f9f7;
+          padding: 12px;
+        }
+
+        .rich-editor .ql-container {
+          border: 1px solid #d8ded8;
+          border-top: 0;
+          border-radius: 0 0 10px 10px;
+          min-height: 320px;
+          font-size: 16px;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .rich-editor .ql-editor {
+          min-height: 320px;
+          line-height: 1.8;
+          padding: 20px;
+          text-align: left;
+        }
+
+        .rich-editor .ql-editor p {
+          margin-bottom: 15px;
+        }
+
+        .rich-editor .ql-editor h1,
+        .rich-editor .ql-editor h2,
+        .rich-editor .ql-editor h3 {
+          margin-top: 20px;
+          margin-bottom: 12px;
+        }
+
+        .rich-editor .ql-editor.ql-blank::before {
+          color: #999;
+          font-style: normal;
+          left: 20px;
+        }
+
+        .rich-editor:focus-within .ql-toolbar {
+          border-color: #8b6b3f;
+        }
+
+        .rich-editor:focus-within .ql-container {
+          border-color: #8b6b3f;
+        }
+
+        .editor-help {
+          display: block;
+          margin-top: 5px;
+          color: #777;
+          font-size: 12px;
+        }
+
+        /* ================= BUTTONS ================= */
+
         .community-form-buttons {
           display: flex;
           gap: 10px;
@@ -1425,6 +1607,17 @@ export default function AdminRooms() {
           font-size: 13px;
           line-height: 1.6;
           min-height: 60px;
+          overflow: hidden;
+        }
+
+        .post-text p {
+          margin: 0 0 10px;
+        }
+
+        .post-text h1,
+        .post-text h2,
+        .post-text h3 {
+          color: #18231d;
         }
 
         .post-actions {
@@ -1457,6 +1650,8 @@ export default function AdminRooms() {
           background: #f5e7e5;
           color: #a33d32;
         }
+
+        /* ================= RESPONSIVE ================= */
 
         @media (max-width: 900px) {
 
@@ -1495,9 +1690,20 @@ export default function AdminRooms() {
             grid-template-columns: 1fr;
           }
 
+          .rich-editor .ql-toolbar {
+            padding: 8px;
+          }
+
+          .rich-editor .ql-container,
+          .rich-editor .ql-editor {
+            min-height: 250px;
+          }
+
         }
 
       `}</style>
+
     </div>
   );
 }
+

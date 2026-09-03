@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import "./Community.css";
 
 export default function CommunityPost() {
@@ -24,7 +25,6 @@ export default function CommunityPost() {
         }
 
         const data = await response.json();
-
         setPost(data);
       } catch (err) {
         console.error("Community post error:", err);
@@ -101,8 +101,6 @@ export default function CommunityPost() {
 
             <h1>{post.title}</h1>
 
-            <p>{post.content}</p>
-
             <div className="post-detail-meta">
               <span>
                 By {post.author || "Backpacker Gateways"}
@@ -145,7 +143,9 @@ export default function CommunityPost() {
           )}
 
           <article className="community-post-article">
-            <p>{post.content}</p>
+            <ReactMarkdown>
+              {post.content}
+            </ReactMarkdown>
           </article>
 
           <div className="community-post-bottom">
@@ -164,3 +164,4 @@ export default function CommunityPost() {
     </main>
   );
 }
+
