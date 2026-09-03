@@ -7,6 +7,10 @@ import Booking from "./pages/Booking";
 import Gear from "./pages/Gear";
 import VehicleRental from "./pages/VehicleRental";
 import About from "./pages/About";
+
+import Community from "./pages/Community";
+import CommunityPost from "./pages/CommunityPost";
+
 import AdminLogin from "./pages/AdminLogin";
 import AdminRooms from "./pages/AdminRooms";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +38,15 @@ export default function App() {
 
         {/* ABOUT US */}
         <Route path="/about" element={<About />} />
+
+        {/* BACKPACKER COMMUNITY */}
+        <Route path="/community" element={<Community />} />
+
+        {/* COMMUNITY INDIVIDUAL POSTS */}
+        <Route
+          path="/community/post/:id"
+          element={<CommunityPost />}
+        />
 
         {/* ADMIN */}
         <Route path="/admin" element={<AdminLogin />} />

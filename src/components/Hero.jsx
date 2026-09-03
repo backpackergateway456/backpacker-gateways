@@ -971,7 +971,7 @@ export default function Hero() {
         <div className="community-grid">
           {communityPosts.map((post) => (
             <Link
-              to="/blog"
+              to="/community" 
               className="community-card"
               key={post.title}
             >

@@ -8,6 +8,7 @@ const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const gearRoutes = require("./routes/gearRoutes");
+const communityRoutes = require("./routes/communityRoutes");
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.use("/api/admin", adminRoutes);
 
 // Gear API
 app.use("/api/gears", gearRoutes);
+
+// Community API
+app.use("/api/community", communityRoutes);
 
 // Home route
 app.get("/", (req, res) => {
