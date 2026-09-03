@@ -1,4 +1,3 @@
-
 import "./Community.css";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -44,7 +43,7 @@ export default function Community() {
     const fetchCommunityPosts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/community"
+          "https://backpacker-gateways-2.onrender.com/api/community"
         );
 
         if (!response.ok) {
@@ -60,10 +59,7 @@ export default function Community() {
 
         setFeaturedPosts(approvedPosts);
       } catch (error) {
-        console.error(
-          "Community posts error:",
-          error
-        );
+        console.error("Community posts error:", error);
       } finally {
         setLoadingPosts(false);
       }
@@ -386,6 +382,7 @@ export default function Community() {
             ) : featuredPosts.length === 0 ? (
 
               <div className="community-post-empty">
+
                 <h3>
                   No approved posts yet.
                 </h3>
@@ -394,6 +391,7 @@ export default function Community() {
                   New travel stories and information will appear here
                   after they are reviewed and approved.
                 </p>
+
               </div>
 
             ) : (
@@ -683,4 +681,3 @@ export default function Community() {
     </main>
   );
 }
-
