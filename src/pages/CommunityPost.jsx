@@ -1,4 +1,3 @@
-
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Community.css";
@@ -17,7 +16,7 @@ export default function CommunityPost() {
         setError("");
 
         const response = await fetch(
-          `http://localhost:5000/api/community/${id}`
+          `https://backpacker-gateways-2.onrender.com/api/community/${id}`
         );
 
         if (!response.ok) {
@@ -29,7 +28,9 @@ export default function CommunityPost() {
         setPost(data);
       } catch (err) {
         console.error("Community post error:", err);
-        setError("Sorry, the community post you are looking for does not exist.");
+        setError(
+          "Sorry, the community post you are looking for does not exist."
+        );
       } finally {
         setLoading(false);
       }
@@ -72,10 +73,7 @@ export default function CommunityPost() {
               "Sorry, the community post you are looking for does not exist."}
           </p>
 
-          <Link
-            to="/community"
-            className="community-primary-btn"
-          >
+          <Link to="/community" className="community-primary-btn">
             Back to Community
           </Link>
         </section>
@@ -103,9 +101,7 @@ export default function CommunityPost() {
 
             <h1>{post.title}</h1>
 
-            <p>
-              {post.content}
-            </p>
+            <p>{post.content}</p>
 
             <div className="post-detail-meta">
               <span>
@@ -149,9 +145,7 @@ export default function CommunityPost() {
           )}
 
           <article className="community-post-article">
-
             <p>{post.content}</p>
-
           </article>
 
           <div className="community-post-bottom">
@@ -170,4 +164,3 @@ export default function CommunityPost() {
     </main>
   );
 }
-
