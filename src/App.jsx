@@ -48,9 +48,11 @@ export default function App() {
           element={<CommunityPost />}
         />
 
-        {/* ADMIN */}
+        {/* ADMIN LOGIN */}
         <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
+        {/* ADMIN DASHBOARD */}
         <Route
           path="/admin/rooms"
           element={
