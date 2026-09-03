@@ -446,7 +446,16 @@ export default function Community() {
                       {post.title}
                     </h3>
 
-                    <p>
+                    {/* ONLY 3 LINES PREVIEW */}
+
+                    <p
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
                       {post.content}
                     </p>
 
@@ -681,3 +690,4 @@ export default function Community() {
     </main>
   );
 }
+
