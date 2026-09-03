@@ -6,9 +6,15 @@ import {
   deleteRoom,
 } from "../services/roomApi";
 
+const API_URL = "https://backpacker-gateways-2.onrender.com";
+
 export default function AdminRooms() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [creatingPost, setCreatingPost] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -22,7 +28,21 @@ export default function AdminRooms() {
     available: true,
   });
 
+  const [communityForm, setCommunityForm] = useState({
+    title: "",
+    category: "Travel",
+    author: "Backpacker Gateways",
+    location: "Nepal",
+    image: "",
+    content: "",
+    featured: false,
+  });
+
   const [editingId, setEditingId] = useState(null);
+
+  /* =========================
+     ROOMS
+  ========================= */
 
   const loadRooms = async () => {
     try {
@@ -45,9 +65,47 @@ export default function AdminRooms() {
     }
   };
 
+  /* =========================
+     COMMUNITY POSTS
+  ========================= */
+
+  const loadPosts = async () => {
+    try {
+      setPostsLoading(true);
+
+      const response = await fetch(`${API_URL}/api/community`);
+
+      if (!response.ok) {
+        throw new Error("Unable to load community posts");
+      }
+
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setPosts(data);
+      } else if (Array.isArray(data?.data)) {
+        setPosts(data.data);
+      } else if (Array.isArray(data?.posts)) {
+        setPosts(data.posts);
+      } else {
+        setPosts([]);
+      }
+    } catch (error) {
+      console.error("COMMUNITY ADMIN ERROR:", error);
+      setPosts([]);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadRooms();
+    loadPosts();
   }, []);
+
+  /* =========================
+     ROOM FORM
+  ========================= */
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -152,26 +210,200 @@ export default function AdminRooms() {
     }
   };
 
+  /* =========================
+     NEW COMMUNITY POST
+  ========================= */
+
+  const handleCommunityChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setCommunityForm({
+      ...communityForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const resetCommunityForm = () => {
+    setCommunityForm({
+      title: "",
+      category: "Travel",
+      author: "Backpacker Gateways",
+      location: "Nepal",
+      image: "",
+      content: "",
+      featured: false,
+    });
+  };
+
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+
+    try {
+      setCreatingPost(true);
+
+      const response = await fetch(`${API_URL}/api/community`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(communityForm),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to create community post"
+        );
+      }
+
+      alert(
+        "Community post created successfully. It is now pending approval."
+      );
+
+      resetCommunityForm();
+
+      await loadPosts();
+    } catch (error) {
+      console.error("CREATE POST ERROR:", error);
+      alert(error.message);
+    } finally {
+      setCreatingPost(false);
+    }
+  };
+
+  /* =========================
+     COMMUNITY ACTIONS
+  ========================= */
+
+  const updatePostStatus = async (post, status) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/community/${post._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to update post"
+        );
+      }
+
+      alert(`Post ${status} successfully`);
+
+      await loadPosts();
+    } catch (error) {
+      console.error("POST STATUS ERROR:", error);
+      alert(error.message);
+    }
+  };
+
+  const deletePost = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this community post?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/community/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to delete community post"
+        );
+      }
+
+      alert("Community post deleted successfully");
+
+      await loadPosts();
+    } catch (error) {
+      console.error("DELETE POST ERROR:", error);
+      alert(error.message);
+    }
+  };
+
+  const getPostTitle = (post) => {
+    return (
+      post.title ||
+      post.name ||
+      post.heading ||
+      "Community Post"
+    );
+  };
+
+  const getPostText = (post) => {
+    return (
+      post.content ||
+      post.description ||
+      post.text ||
+      post.body ||
+      ""
+    );
+  };
+
+  const getPostImage = (post) => {
+    return (
+      post.image ||
+      post.imageUrl ||
+      post.images?.[0] ||
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
+    );
+  };
+
+  const getPostStatus = (post) => {
+    return post.status || "pending";
+  };
+
   return (
     <div className="admin-page">
-
       <div className="admin-container">
+
+        {/* ================= HEADER ================= */}
 
         <div className="admin-header">
           <div>
             <span>BACKPACKER GATEWAYS</span>
-            <h1>Room Management</h1>
+
+            <h1>Admin Dashboard</h1>
+
             <p>
-              Add, edit and manage hotel rooms and mountain lodges.
+              Manage rooms, hotels and community posts.
             </p>
           </div>
 
           <button
             className="refresh-btn"
-            onClick={loadRooms}
+            onClick={() => {
+              loadRooms();
+              loadPosts();
+            }}
           >
-            Refresh Rooms
+            Refresh Dashboard
           </button>
+        </div>
+
+        {/* ================= ROOMS ================= */}
+
+        <div className="section-label">
+          ROOM MANAGEMENT
         </div>
 
         <div className="admin-card">
@@ -186,6 +418,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Room / Hotel Name</label>
+
                 <input
                   name="name"
                   value={form.name}
@@ -197,6 +430,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Destination</label>
+
                 <input
                   name="destination"
                   value={form.destination}
@@ -208,6 +442,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Price Per Night (NPR)</label>
+
                 <input
                   type="number"
                   name="price"
@@ -220,6 +455,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Guest Capacity</label>
+
                 <input
                   type="number"
                   name="capacity"
@@ -232,6 +468,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Beds</label>
+
                 <input
                   name="beds"
                   value={form.beds}
@@ -242,6 +479,7 @@ export default function AdminRooms() {
 
               <div className="field">
                 <label>Image URL</label>
+
                 <input
                   name="images"
                   value={form.images}
@@ -301,7 +539,9 @@ export default function AdminRooms() {
                 type="submit"
                 className="save-btn"
               >
-                {editingId ? "Update Room" : "Add Room"}
+                {editingId
+                  ? "Update Room"
+                  : "Add Room"}
               </button>
 
               {editingId && (
@@ -317,14 +557,18 @@ export default function AdminRooms() {
             </div>
 
           </form>
-
         </div>
+
+        {/* ================= EXISTING ROOMS ================= */}
 
         <div className="rooms-admin-section">
 
           <div className="rooms-title">
             <h2>Existing Rooms</h2>
-            <span>{rooms.length} rooms</span>
+
+            <span>
+              {rooms.length} rooms
+            </span>
           </div>
 
           {loading ? (
@@ -366,26 +610,35 @@ export default function AdminRooms() {
                     </p>
 
                     <div className="room-meta">
+
                       <strong>
-                        NPR {Number(room.price || 0).toLocaleString("en-NP")}
+                        NPR{" "}
+                        {Number(
+                          room.price || 0
+                        ).toLocaleString("en-NP")}
                       </strong>
 
                       <span>
                         {room.capacity} Guests
                       </span>
+
                     </div>
 
                     <div className="admin-actions">
 
                       <button
-                        onClick={() => handleEdit(room)}
+                        onClick={() =>
+                          handleEdit(room)
+                        }
                         className="edit-btn"
                       >
                         Edit
                       </button>
 
                       <button
-                        onClick={() => handleDelete(room._id)}
+                        onClick={() =>
+                          handleDelete(room._id)
+                        }
                         className="delete-btn"
                       >
                         Delete
@@ -400,6 +653,327 @@ export default function AdminRooms() {
               ))}
 
             </div>
+          )}
+
+        </div>
+
+        {/* ================= COMMUNITY ================= */}
+
+        <div className="community-section">
+
+          <div className="community-header">
+
+            <div>
+              <div className="section-label">
+                COMMUNITY MANAGEMENT
+              </div>
+
+              <h2>Community Posts</h2>
+
+              <p>
+                Create, review and manage community posts.
+              </p>
+            </div>
+
+            <button
+              className="refresh-community-btn"
+              onClick={loadPosts}
+            >
+              Refresh Posts
+            </button>
+
+          </div>
+
+          {/* ================= NEW COMMUNITY POST ================= */}
+
+          <div className="community-create-card">
+
+            <div className="create-post-heading">
+              <div>
+                <span className="create-label">
+                  ADMIN POST
+                </span>
+
+                <h3>Create New Community Post</h3>
+
+                <p>
+                  Publish a new story, travel update,
+                  guide or community announcement.
+                </p>
+              </div>
+            </div>
+
+            <form
+              onSubmit={handleCreatePost}
+              className="community-form"
+            >
+
+              <div className="community-form-grid">
+
+                <div className="field">
+                  <label>Post Title</label>
+
+                  <input
+                    name="title"
+                    value={communityForm.title}
+                    onChange={handleCommunityChange}
+                    placeholder="10 Things to Know Before Everest Base Camp"
+                    required
+                  />
+                </div>
+
+                <div className="field">
+                  <label>Category</label>
+
+                  <select
+                    name="category"
+                    value={communityForm.category}
+                    onChange={handleCommunityChange}
+                  >
+                    <option value="Travel">
+                      Travel
+                    </option>
+
+                    <option value="Trekking">
+                      Trekking
+                    </option>
+
+                    <option value="Adventure">
+                      Adventure
+                    </option>
+
+                    <option value="Destination">
+                      Destination
+                    </option>
+
+                    <option value="Tips">
+                      Travel Tips
+                    </option>
+
+                    <option value="News">
+                      News
+                    </option>
+
+                    <option value="Community">
+                      Community
+                    </option>
+                  </select>
+                </div>
+
+                <div className="field">
+                  <label>Author</label>
+
+                  <input
+                    name="author"
+                    value={communityForm.author}
+                    onChange={handleCommunityChange}
+                    placeholder="Backpacker Gateways"
+                  />
+                </div>
+
+                <div className="field">
+                  <label>Location</label>
+
+                  <input
+                    name="location"
+                    value={communityForm.location}
+                    onChange={handleCommunityChange}
+                    placeholder="Nepal"
+                  />
+                </div>
+
+                <div className="field full">
+                  <label>Image URL</label>
+
+                  <input
+                    name="image"
+                    value={communityForm.image}
+                    onChange={handleCommunityChange}
+                    placeholder="https://..."
+                  />
+
+                  <small>
+                    Add a public image URL for the post.
+                  </small>
+                </div>
+
+                <div className="field full">
+                  <label>Post Content</label>
+
+                  <textarea
+                    name="content"
+                    value={communityForm.content}
+                    onChange={handleCommunityChange}
+                    placeholder="Write your community post here..."
+                    rows="8"
+                    required
+                  />
+                </div>
+
+                <div className="featured-field">
+
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      checked={communityForm.featured}
+                      onChange={handleCommunityChange}
+                    />
+
+                    Feature this post
+                  </label>
+
+                </div>
+
+              </div>
+
+              <div className="community-form-buttons">
+
+                <button
+                  type="submit"
+                  className="create-post-btn"
+                  disabled={creatingPost}
+                >
+                  {creatingPost
+                    ? "Creating Post..."
+                    : "Create Community Post"}
+                </button>
+
+                <button
+                  type="button"
+                  className="clear-post-btn"
+                  onClick={resetCommunityForm}
+                  disabled={creatingPost}
+                >
+                  Clear
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+          {/* ================= POST LIST ================= */}
+
+          {postsLoading ? (
+
+            <div className="loading">
+              Loading community posts...
+            </div>
+
+          ) : posts.length === 0 ? (
+
+            <div className="empty">
+              No community posts found.
+            </div>
+
+          ) : (
+
+            <div className="community-grid">
+
+              {posts.map((post) => {
+
+                const status =
+                  getPostStatus(post);
+
+                return (
+
+                  <div
+                    className="community-card"
+                    key={post._id}
+                  >
+
+                    <img
+                      src={getPostImage(post)}
+                      alt={getPostTitle(post)}
+                    />
+
+                    <div className="community-content">
+
+                      <div className="post-top">
+
+                        <span className="post-label">
+                          COMMUNITY
+                        </span>
+
+                        <span
+                          className={`status ${status}`}
+                        >
+                          {status}
+                        </span>
+
+                      </div>
+
+                      <h3>
+                        {getPostTitle(post)}
+                      </h3>
+
+                      {post.author && (
+                        <p className="post-author">
+                          By {post.author}
+                        </p>
+                      )}
+
+                      {post.category && (
+                        <p className="post-category">
+                          {post.category}
+                          {post.location
+                            ? ` • ${post.location}`
+                            : ""}
+                        </p>
+                      )}
+
+                      <p className="post-text">
+                        {getPostText(post)}
+                      </p>
+
+                      <div className="post-actions">
+
+                        <button
+                          className="approve-btn"
+                          onClick={() =>
+                            updatePostStatus(
+                              post,
+                              "approved"
+                            )
+                          }
+                        >
+                          Approve
+                        </button>
+
+                        <button
+                          className="reject-btn"
+                          onClick={() =>
+                            updatePostStatus(
+                              post,
+                              "rejected"
+                            )
+                          }
+                        >
+                          Reject
+                        </button>
+
+                        <button
+                          className="delete-post-btn"
+                          onClick={() =>
+                            deletePost(post._id)
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                );
+              })}
+
+            </div>
+
           )}
 
         </div>
@@ -450,7 +1024,8 @@ export default function AdminRooms() {
           color: #68716b;
         }
 
-        .refresh-btn {
+        .refresh-btn,
+        .refresh-community-btn {
           border: 0;
           background: #18231d;
           color: white;
@@ -458,6 +1033,14 @@ export default function AdminRooms() {
           border-radius: 9px;
           cursor: pointer;
           font-weight: 700;
+        }
+
+        .section-label {
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 3px;
+          color: #8b6b3f;
+          margin-bottom: 10px;
         }
 
         .admin-card {
@@ -474,7 +1057,8 @@ export default function AdminRooms() {
           margin-bottom: 25px;
         }
 
-        .form-grid {
+        .form-grid,
+        .community-form-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 20px;
@@ -496,7 +1080,8 @@ export default function AdminRooms() {
         }
 
         .field input,
-        .field textarea {
+        .field textarea,
+        .field select {
           width: 100%;
           border: 1px solid #d8ded8;
           border-radius: 9px;
@@ -504,10 +1089,12 @@ export default function AdminRooms() {
           font-size: 14px;
           outline: none;
           font-family: inherit;
+          background: white;
         }
 
         .field input:focus,
-        .field textarea:focus {
+        .field textarea:focus,
+        .field select:focus {
           border-color: #8b6b3f;
         }
 
@@ -515,11 +1102,13 @@ export default function AdminRooms() {
           color: #777;
         }
 
-        .available-field {
+        .available-field,
+        .featured-field {
           grid-column: 1 / -1;
         }
 
-        .available-field label {
+        .available-field label,
+        .featured-field label {
           display: flex;
           gap: 10px;
           align-items: center;
@@ -658,11 +1247,221 @@ export default function AdminRooms() {
           text-align: center;
           border-radius: 18px;
           color: #68716b;
+          border: 1px solid #e1e6e1;
+        }
+
+        /* ================= COMMUNITY ================= */
+
+        .community-section {
+          margin-top: 70px;
+          padding-top: 45px;
+          border-top: 1px solid #dfe5df;
+        }
+
+        .community-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 20px;
+          margin-bottom: 25px;
+        }
+
+        .community-header h2 {
+          margin: 0 0 7px;
+          font-size: 30px;
+        }
+
+        .community-header p {
+          margin: 0;
+          color: #68716b;
+        }
+
+        /* ================= NEW POST ================= */
+
+        .community-create-card {
+          background: white;
+          border: 1px solid #e1e6e1;
+          border-radius: 20px;
+          padding: 30px;
+          margin-bottom: 35px;
+          box-shadow: 0 10px 30px rgba(24,35,29,.06);
+        }
+
+        .create-post-heading {
+          margin-bottom: 25px;
+        }
+
+        .create-label {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 2px;
+          color: #8b6b3f;
+        }
+
+        .create-post-heading h3 {
+          margin: 8px 0;
+          font-size: 24px;
+        }
+
+        .create-post-heading p {
+          margin: 0;
+          color: #68716b;
+          font-size: 14px;
+        }
+
+        .community-form-buttons {
+          display: flex;
+          gap: 10px;
+          margin-top: 25px;
+        }
+
+        .create-post-btn,
+        .clear-post-btn {
+          border: 0;
+          border-radius: 9px;
+          padding: 13px 22px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .create-post-btn {
+          background: #18231d;
+          color: white;
+        }
+
+        .create-post-btn:disabled,
+        .clear-post-btn:disabled {
+          opacity: .6;
+          cursor: not-allowed;
+        }
+
+        .clear-post-btn {
+          background: #e8ece8;
+          color: #18231d;
+        }
+
+        /* ================= POST GRID ================= */
+
+        .community-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
+
+        .community-card {
+          overflow: hidden;
+          background: white;
+          border: 1px solid #e1e6e1;
+          border-radius: 18px;
+        }
+
+        .community-card > img {
+          width: 100%;
+          height: 220px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .community-content {
+          padding: 20px;
+        }
+
+        .post-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .post-label {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 2px;
+          color: #8b6b3f;
+        }
+
+        .status {
+          padding: 5px 9px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .status.pending {
+          background: #f5eee0;
+          color: #8b6b3f;
+        }
+
+        .status.approved {
+          background: #e5f1e7;
+          color: #347044;
+        }
+
+        .status.rejected {
+          background: #f5e7e5;
+          color: #a33d32;
+        }
+
+        .community-content h3 {
+          margin: 0 0 7px;
+          font-size: 20px;
+        }
+
+        .post-author {
+          font-size: 12px;
+          color: #8b6b3f !important;
+          font-weight: 700;
+        }
+
+        .post-category {
+          font-size: 12px !important;
+          color: #8b6b3f !important;
+          font-weight: 700;
+        }
+
+        .post-text {
+          color: #68716b;
+          font-size: 13px;
+          line-height: 1.6;
+          min-height: 60px;
+        }
+
+        .post-actions {
+          display: flex;
+          gap: 7px;
+          margin-top: 18px;
+        }
+
+        .post-actions button {
+          flex: 1;
+          border: 0;
+          padding: 10px 6px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 800;
+          font-size: 12px;
+        }
+
+        .approve-btn {
+          background: #e5f1e7;
+          color: #347044;
+        }
+
+        .reject-btn {
+          background: #f5eee0;
+          color: #8b6b3f;
+        }
+
+        .delete-post-btn {
+          background: #f5e7e5;
+          color: #a33d32;
         }
 
         @media (max-width: 900px) {
 
-          .admin-rooms-grid {
+          .admin-rooms-grid,
+          .community-grid {
             grid-template-columns: repeat(2, 1fr);
           }
 
@@ -674,28 +1473,31 @@ export default function AdminRooms() {
             padding: 30px 15px;
           }
 
-          .admin-header {
+          .admin-header,
+          .community-header {
             flex-direction: column;
             align-items: flex-start;
           }
 
-          .form-grid {
+          .form-grid,
+          .community-form-grid {
             grid-template-columns: 1fr;
           }
 
           .field.full,
-          .available-field {
+          .available-field,
+          .featured-field {
             grid-column: auto;
           }
 
-          .admin-rooms-grid {
+          .admin-rooms-grid,
+          .community-grid {
             grid-template-columns: 1fr;
           }
 
         }
 
       `}</style>
-
     </div>
   );
 }
